@@ -76,8 +76,8 @@ public class MainActivity extends AppCompatActivity
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener {
 
-    private static final LatLng START_LOCATION = new LatLng(31.774511, 35.011642);
-    private static final int START_ZOOM_LEVEL = 7;
+    private static final LatLng START_LOCATION = new LatLng(32.065953, 34.775512);
+    private static final int START_ZOOM_LEVEL = 17;
     private static final int MINIMUM_ZOOM_LEVEL_TO_SHOW_ACCIDENTS = 16;
     private static final String TUTORIAL_SHOWED_KEY = "il.co.anyway.app.TUTORIAL_SHOWED";
 
@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity
         mDoubleBackToExitPressedOnce = false;
 
         // map start in START_ZOOM_LEVEL
-        mMapIsInClusterMode = true;
+        mMapIsInClusterMode = false;
 
         // Dialog informing the user this app need internet connection never shown before
         mShowedDialogAboutInternetConnection = false;
@@ -256,7 +256,7 @@ public class MainActivity extends AppCompatActivity
         mMap.setClustering(settings);
 
         // Disable location button and blue dot
-        mMap.setMyLocationEnabled(false);
+        mMap.setMyLocationEnabled(true);
 
         // Disable toolbar on the right bottom corner(taking user to google maps app)
         mMap.getUiSettings().setMapToolbarEnabled(false);
@@ -845,7 +845,7 @@ public class MainActivity extends AppCompatActivity
         mMap.addMarker(new MarkerOptions()
                 .title(Utility.getAccidentTypeByIndex(a.getSubType(), this))
                 .snippet(getString(R.string.marker_default_desc))
-                .icon(BitmapDescriptorFactory.fromResource(Utility.getIconForMarker(a.getSeverity(), a.getSubType())))
+//                .icon(BitmapDescriptorFactory.fromResource(Utility.getIconForMarker(a.getSeverity(), a.getSubType())))
                 .position(a.getLocation()))
                 .setData(a);
 

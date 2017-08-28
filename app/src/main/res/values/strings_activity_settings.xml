@@ -23,7 +23,7 @@
     <string name="pref_from_date_key" translatable="false">show_from_date_new</string>
 
     <string name="pref_title_to_date">עד תאריך</string>
-    <string name="pref_default_to_date">01/01/2015</string>
+    <string name="pref_default_to_date">01/08/2017</string>
     <string name="pref_to_date_key" translatable="false">show_to_date_new</string>
 
 
