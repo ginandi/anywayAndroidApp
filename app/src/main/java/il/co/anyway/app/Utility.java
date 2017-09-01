@@ -487,9 +487,13 @@ public class Utility {
                 break;
         }
 
+        Log.d("gggggg", "Inner type = " + innerType + ", sev = " + severity + ", Subtype is = " + accidentSubType);
+
         // choose the icon to show by the icon type and the severity
         int icon = 0;
-        if (accidentSubType == Accident.ACCIDENT_MULTIPLE) {
+        if (accidentSubType == Accident.ACCIDENT_TYPE_RESCUE_UNION) {
+            icon = R.drawable.ic_security_black_24dp;
+        } else if (accidentSubType == Accident.ACCIDENT_MULTIPLE) {
             switch (severity) {
                 case Accident.SEVERITY_FATAL:
                     icon = R.drawable.multiple_lethal;
