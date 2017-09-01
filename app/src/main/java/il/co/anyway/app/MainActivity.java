@@ -845,7 +845,8 @@ public class MainActivity extends AppCompatActivity
         mMap.addMarker(new MarkerOptions()
                 .title(Utility.getAccidentTypeByIndex(a.getSubType(), this))
                 .snippet(getString(R.string.marker_default_desc))
-//                .icon(BitmapDescriptorFactory.fromResource(Utility.getIconForMarker(a.getSeverity(), a.getSubType())))
+                .icon(BitmapDescriptorFactory.fromResource(Utility.getIconForMarker(a.getSeverity(), a.getSubType())))
+//                .icon(BitmapDescriptorFactory.fromResource(R.drawable.vehicle_person_lethal))
                 .position(a.getLocation()))
                 .setData(a);
 
