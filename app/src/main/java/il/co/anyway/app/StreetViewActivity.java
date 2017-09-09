@@ -65,13 +65,11 @@ public class StreetViewActivity extends FragmentActivity implements
     @Override
     protected void onStart() {
         super.onStart();
-
-//        MarkersManager.getInstance().registerNewAccidentListener(this);
     }
 
     @Override
     protected void onStop() {
-        MarkersManager.getInstance().unregisterAccidentListener();
+        MarkersManager.getInstance().unregisterAccidentListener(this);
 
         super.onStop();
     }
@@ -93,7 +91,6 @@ public class StreetViewActivity extends FragmentActivity implements
      */
     @Override
     public void onStreetViewPanoramaCameraChange(StreetViewPanoramaCamera streetViewPanoramaCamera) {
-//        Log.d("gggggg", "onStreetViewPanoramaCameraChange");
         removeAllImages();
 
         mBearing = streetViewPanoramaCamera.bearing;
@@ -112,7 +109,7 @@ public class StreetViewActivity extends FragmentActivity implements
      */
     @Override
     public void onStreetViewPanoramaChange(StreetViewPanoramaLocation streetViewPanoramaLocation) {
-//        Log.d("gggggg", "onStreetViewPanoramaChange");
+        Log.d("ffffff", "onStreetViewPanoramaChange");
         removeAllImages();
 
         // Clear all markers
@@ -137,7 +134,7 @@ public class StreetViewActivity extends FragmentActivity implements
 
     @Override
     public void onNewAccident(Accident a) {
-        Log.d("gggg", "New accident!  " + a);
+        Log.d("ffffff", "New accident!  " + a);
         possiblyShowMarker(a);
     }
 

@@ -1,7 +1,12 @@
 package il.co.anyway.app.singletons;
 
+import android.util.Log;
+
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import il.co.anyway.app.models.Accident;
 import il.co.anyway.app.models.Discussion;
@@ -15,14 +20,14 @@ public class MarkersManager {
 
     private List<Accident> accidentsList;
     private List<Discussion> discussionList;
-    private OnNewAccidentListener mOnNewAccidentListener;
+    private Set<OnNewAccidentListener> mOnNewAccidentListeners;
     private OnNewDiscussionListener mOnNewDiscussionListener;
 
     // making the default constructor private make sure there will be only one instance of the accidents manager
     private MarkersManager() {
         accidentsList = new ArrayList<>();
         discussionList = new ArrayList<>();
-        mOnNewAccidentListener = null;
+        mOnNewAccidentListeners = new CopyOnWriteArraySet<>();
         mOnNewDiscussionListener = null;
     }
 
@@ -82,9 +87,14 @@ public class MarkersManager {
             return false;
 
         if (!isAccidentExist(toAdd)) {
+            Log.d("ffffff", "adding accident");
             accidentsList.add(toAdd);
-            if (mOnNewAccidentListener != null)
-                mOnNewAccidentListener.onNewAccident(toAdd);
+            if (mOnNewAccidentListeners != null) {
+                Log.d("ffffff", "calling listeners");
+                for (OnNewAccidentListener onNewAccidentListener : mOnNewAccidentListeners) {
+                    onNewAccidentListener.onNewAccident(toAdd);
+                }
+            }
         } else {
             return false;
         }
@@ -122,6 +132,7 @@ public class MarkersManager {
      * @return How many accidents from the list actually taken(duplicate accident will ignore)
      */
     public int addAllAccidents(List<Accident> toAddList, boolean reset) {
+        Log.d("ffffff", "addAllAccidents");
 
         if (reset)
             accidentsList.clear();
@@ -232,11 +243,11 @@ public class MarkersManager {
     }
 
     public void registerNewAccidentListener(OnNewAccidentListener onNewAccidentListener) {
-        mOnNewAccidentListener = onNewAccidentListener;
+        mOnNewAccidentListeners.add(onNewAccidentListener);
     }
 
-    public void unregisterAccidentListener() {
-        mOnNewAccidentListener = null;
+    public void unregisterAccidentListener(OnNewAccidentListener onNewAccidentListener) {
+        mOnNewAccidentListeners.remove(onNewAccidentListener);
     }
 
     public void registerNewDiscussionListener(OnNewDiscussionListener onNewDiscussionListener) {
