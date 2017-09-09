@@ -209,7 +209,7 @@ public class MainActivity extends AppCompatActivity
         mGoogleApiClient.disconnect();
 
         // unregister activity updates from MarkersManager
-        MarkersManager.getInstance().unregisterAccidentListener();
+        MarkersManager.getInstance().unregisterAccidentListener(this);
         MarkersManager.getInstance().unregsiterDiscussionListener();
 
         super.onStop();
