@@ -178,4 +178,9 @@ public class Accident {
         this.markerAddedToMap = markerAddedToMap;
         return this;
     }
+
+    @Override
+    public String toString() {
+        return String.format("Accident %s is in %s", title, location);
+    }
 }
