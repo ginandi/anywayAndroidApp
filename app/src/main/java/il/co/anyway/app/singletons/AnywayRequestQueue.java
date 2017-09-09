@@ -89,7 +89,7 @@ public class AnywayRequestQueue {
      */
     public void addMarkersRequest(double ne_lat, double ne_lng, double sw_lat, double sw_lng, int zoom,
                                   String start_date, String end_date,
-                                  boolean show_fatal, boolean show_severe, boolean show_light, boolean show_inaccurate) {
+                                  boolean show_fatal, boolean show_severe, boolean show_light, boolean show_inaccurate, boolean shouldReset) {
 
         final String DEFAULT_REQUEST_FORMAT = "json";
 
@@ -116,7 +116,7 @@ public class AnywayRequestQueue {
 
         try {
             URL url = new URL(builtUri.toString());
-            addMarkersRequest(url.toString());
+            addMarkersRequest(url.toString(), shouldReset);
         } catch (MalformedURLException e) {
             Log.e(LOG_TAG, "Error building the URL: " + e.getMessage());
         }
@@ -127,7 +127,7 @@ public class AnywayRequestQueue {
      *
      * @param url URL of request
      */
-    private void addMarkersRequest(String url) {
+    private void addMarkersRequest(String url, final boolean shouldReset) {
 
         JsonObjectRequest jsObjRequest = new JsonObjectRequest
                 (Request.Method.GET, url, new Response.Listener<JSONObject>() {
@@ -141,8 +141,8 @@ public class AnywayRequestQueue {
                         int fetchStatus = Utility.getMarkersDataFromJson(response, fetchedAccidents, fetchedDiscussion);
 
                         if (fetchStatus == 0) {
-                            MarkersManager.getInstance().addAllAccidents(fetchedAccidents, MarkersManager.DO_NOT_RESET);
-                            MarkersManager.getInstance().addAllDiscussions(fetchedDiscussion, MarkersManager.DO_NOT_RESET);
+                            MarkersManager.getInstance().addAllAccidents(fetchedAccidents, shouldReset);
+                            MarkersManager.getInstance().addAllDiscussions(fetchedDiscussion, shouldReset);
                         }
 
                     }

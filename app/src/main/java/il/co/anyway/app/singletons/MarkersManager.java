@@ -3,7 +3,6 @@ package il.co.anyway.app.singletons;
 import java.util.ArrayList;
 import java.util.List;
 
-import il.co.anyway.app.MainActivity;
 import il.co.anyway.app.models.Accident;
 import il.co.anyway.app.models.Discussion;
 
@@ -16,13 +15,15 @@ public class MarkersManager {
 
     private List<Accident> accidentsList;
     private List<Discussion> discussionList;
-    private MainActivity mListenerActivity;
+    private OnNewAccidentListener mOnNewAccidentListener;
+    private OnNewDiscussionListener mOnNewDiscussionListener;
 
     // making the default constructor private make sure there will be only one instance of the accidents manager
     private MarkersManager() {
         accidentsList = new ArrayList<>();
         discussionList = new ArrayList<>();
-        mListenerActivity = null;
+        mOnNewAccidentListener = null;
+        mOnNewDiscussionListener = null;
     }
 
     public static MarkersManager getInstance() {
@@ -82,8 +83,8 @@ public class MarkersManager {
 
         if (!isAccidentExist(toAdd)) {
             accidentsList.add(toAdd);
-            if (mListenerActivity != null)
-                mListenerActivity.addAccidentToMap(toAdd);
+            if (mOnNewAccidentListener != null)
+                mOnNewAccidentListener.onNewAccident(toAdd);
         } else {
             return false;
         }
@@ -104,8 +105,8 @@ public class MarkersManager {
 
         if (!isDiscussionExist(toAdd)) {
             discussionList.add(toAdd);
-            if (mListenerActivity != null)
-                mListenerActivity.addDiscussionToMap(toAdd);
+            if (mOnNewDiscussionListener != null)
+                mOnNewDiscussionListener.onNewDiscussion(toAdd);
         } else {
             return false;
         }
@@ -230,11 +231,19 @@ public class MarkersManager {
             d.setMarkerAddedToMap(false);
     }
 
-    public void registerListenerActivity(MainActivity activity) {
-        mListenerActivity = activity;
+    public void registerNewAccidentListener(OnNewAccidentListener onNewAccidentListener) {
+        mOnNewAccidentListener = onNewAccidentListener;
     }
 
-    public void unregisterListenerActivity() {
-        mListenerActivity = null;
+    public void unregisterAccidentListener() {
+        mOnNewAccidentListener = null;
+    }
+
+    public void registerNewDiscussionListener(OnNewDiscussionListener onNewDiscussionListener) {
+        mOnNewDiscussionListener = onNewDiscussionListener;
+    }
+
+    public void unregsiterDiscussionListener() {
+        mOnNewDiscussionListener = null;
     }
 }

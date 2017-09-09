@@ -9,6 +9,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -278,7 +279,7 @@ public class Utility {
      * @param zoomLevel map zoom level
      * @param context   activity context
      */
-    public static void getMarkersByParameters(LatLngBounds bounds, int zoomLevel, Context context) {
+    public static void getMarkersByParameters(LatLngBounds bounds, int zoomLevel, Context context, boolean shouldReset) {
 
         if (bounds == null || context == null)
             return;
@@ -304,7 +305,8 @@ public class Utility {
                 show_fatal,
                 show_severe,
                 show_light,
-                show_inaccurate
+                show_inaccurate,
+                shouldReset
         );
     }
 
@@ -590,6 +592,20 @@ public class Utility {
                 .getActiveNetworkInfo();
 
         return info != null && info.isConnected();
+    }
+
+    public static double getBearingBetweenTwoLocations(LatLng from, LatLng to) {
+        double dLon = (from.longitude - to.longitude);
+        double y = Math.sin(dLon) * Math.cos(to.latitude);
+        double x = Math.cos(from.latitude)*Math.sin(to.latitude) - Math.sin(to.latitude)*Math.cos(from.latitude)*Math.cos(dLon);
+        double brng = Math.toDegrees((Math.atan2(y, x)));
+        return (360 - ((brng + 360) % 360));
+    }
+
+    public static float getDistanceBetweenTwoLocations(LatLng from, LatLng to) {
+        float[] results = new float[1];
+        Location.distanceBetween(from.latitude, from.longitude, to.latitude, to.longitude, results);
+        return results[0];
     }
 
 }
