@@ -93,10 +93,10 @@ public class FetchClusteredAccidents {
                         .appendQueryParameter("thin_markers","true")
                         .appendQueryParameter("start_date", Utility.getTimeStamp(fromDate))
                         .appendQueryParameter("end_date", Utility.getTimeStamp(toDate))
-                        .appendQueryParameter("show_fatal", show_fatal ? "1" : "0")
-                        .appendQueryParameter("show_severe", show_severe ? "1" : "0")
-                        .appendQueryParameter("show_light", show_light ? "1" : "0")
-                        .appendQueryParameter("show_inaccurate", show_inaccurate ? "1" : "0")
+                        .appendQueryParameter("show_fatal", show_fatal ? "1" : "")
+                        .appendQueryParameter("show_severe", show_severe ? "1" : "")
+                        .appendQueryParameter("show_light", show_light ? "1" : "")
+                        .appendQueryParameter("show_inaccurate", show_inaccurate ? "1" : "")
 
                         // TODO add this options in user preferences
                         .appendQueryParameter("show_markers", "1")
