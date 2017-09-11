@@ -103,10 +103,12 @@ public class AnywayRequestQueue {
                 .appendQueryParameter("thin_markers","false")
                 .appendQueryParameter("start_date", start_date)
                 .appendQueryParameter("end_date", end_date)
-                .appendQueryParameter("show_fatal", show_fatal ? "1" : "0")
-                .appendQueryParameter("show_severe", show_severe ? "1" : "0")
-                .appendQueryParameter("show_light", show_light ? "1" : "0")
-                .appendQueryParameter("show_inaccurate", show_inaccurate ? "1" : "0")
+                // For some odd reason, our server only handles an empty string as false.
+                // No idea why
+                .appendQueryParameter("show_fatal", show_fatal ? "1" : "")
+                .appendQueryParameter("show_severe", show_severe ? "1" : "")
+                .appendQueryParameter("show_light", show_light ? "1" : "")
+                .appendQueryParameter("show_inaccurate", show_inaccurate ? "1" : "")
                 .appendQueryParameter("format", DEFAULT_REQUEST_FORMAT)
 
                 // TODO add this options in user preferences
@@ -116,6 +118,7 @@ public class AnywayRequestQueue {
 
         try {
             URL url = new URL(builtUri.toString());
+            Log.d(AnywayRequestQueue.class.getSimpleName(), "Url: " + url);
             addMarkersRequest(url.toString(), shouldReset);
         } catch (MalformedURLException e) {
             Log.e(LOG_TAG, "Error building the URL: " + e.getMessage());
