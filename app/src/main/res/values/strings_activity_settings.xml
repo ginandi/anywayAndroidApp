@@ -15,6 +15,11 @@
     <string name="pref_title_accidents_inaccurate">תאונות שמיקומן משוער</string>
     <string name="pref_accidents_inaccurate_key" translatable="false">checkbox_accidents_inaccurate</string>
 
+    <string name="pref_title_urban_road">כבישים עירוניים</string>
+    <string name="pref_urban_road_key" translatable="false">checkbox_urban_road</string>
+    <string name="pref_title_highway">כבישים בין עירוניים</string>
+    <string name="pref_highway_key" translatable="false">checkbox_highway</string>
+
 
     <string name="pref_header_date_range">סינון לפי טווח תאריכים</string>
 
