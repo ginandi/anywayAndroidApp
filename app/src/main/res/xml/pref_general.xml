@@ -26,5 +26,18 @@
             android:layout="@layout/custom_preference_widget_layout" />
     </PreferenceCategory>
 
+    <PreferenceCategory android:title="@string/pref_header_general">
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="@string/pref_urban_road_key"
+            android:title="@string/pref_title_urban_road"
+            android:layout="@layout/custom_preference_widget_layout" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="@string/pref_highway_key"
+            android:title="@string/pref_title_highway"
+            android:layout="@layout/custom_preference_widget_layout" />
+    </PreferenceCategory>
+
 
 </PreferenceScreen>

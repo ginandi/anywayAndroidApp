@@ -24,6 +24,8 @@ import java.util.Map;
 
 import il.co.anyway.app.PriorityJsonObjectRequest;
 import il.co.anyway.app.Utility;
+import il.co.anyway.app.filters.FiltersRepository;
+import il.co.anyway.app.filters.UriQueryParamAppender;
 import il.co.anyway.app.models.Accident;
 import il.co.anyway.app.models.Discussion;
 
@@ -41,6 +43,7 @@ public class AnywayRequestQueue {
     private final static String LOG_TAG = AnywayRequestQueue.class.getSimpleName();
     private static AnywayRequestQueue instance = null;
     RequestQueue mRequestQueue;
+    private Context mContext;
 
     /**
      * constructor is private to keep singleton behavior
@@ -52,6 +55,7 @@ public class AnywayRequestQueue {
         // Instantiate the RequestQueue - Volley will choose network and cache automatically.
         // This also start the queue
         mRequestQueue = Volley.newRequestQueue(context);
+        mContext = context;
     }
 
     /**
@@ -94,13 +98,13 @@ public class AnywayRequestQueue {
         final String DEFAULT_REQUEST_FORMAT = "json";
 
         // Construct the URL for the Anyway accidents query
-        Uri builtUri = Uri.parse(ANYWAY_MARKERS_BASE_URL).buildUpon()
+        Uri.Builder builder = Uri.parse(ANYWAY_MARKERS_BASE_URL).buildUpon()
                 .appendQueryParameter("ne_lat", Double.toString(ne_lat))
                 .appendQueryParameter("ne_lng", Double.toString(ne_lng))
                 .appendQueryParameter("sw_lat", Double.toString(sw_lat))
                 .appendQueryParameter("sw_lng", Double.toString(sw_lng))
                 .appendQueryParameter("zoom", Integer.toString(zoom))
-                .appendQueryParameter("thin_markers","false")
+                .appendQueryParameter("thin_markers", "false")
                 .appendQueryParameter("start_date", start_date)
                 .appendQueryParameter("end_date", end_date)
                 // For some odd reason, our server only handles an empty string as false.
@@ -112,9 +116,14 @@ public class AnywayRequestQueue {
                 .appendQueryParameter("format", DEFAULT_REQUEST_FORMAT)
 
                 // TODO add this options in user preferences
-                .appendQueryParameter("show_markers","1")
-                .appendQueryParameter("show_discussions","1")
-                .build();
+                .appendQueryParameter("show_markers", "1")
+                .appendQueryParameter("show_discussions", "1");
+
+        for (UriQueryParamAppender filter : FiltersRepository.getFilters(mContext)) {
+            filter.appendQueryParameter(builder);
+        }
+
+        Uri builtUri = builder.build();
 
         try {
             URL url = new URL(builtUri.toString());

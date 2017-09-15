@@ -30,6 +30,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import il.co.anyway.app.filters.FiltersRepository;
+import il.co.anyway.app.filters.UriQueryParamAppender;
 import il.co.anyway.app.models.Accident;
 import il.co.anyway.app.models.Discussion;
 import il.co.anyway.app.singletons.AnywayRequestQueue;
@@ -570,7 +572,7 @@ public class Utility {
         fromDate = DatePreference.getYear(fromDate) + "-" + DatePreference.getMonth(fromDate) + "-" + DatePreference.getDate(fromDate);
         toDate = DatePreference.getYear(toDate) + "-" + DatePreference.getMonth(toDate) + "-" + DatePreference.getDate(toDate);
 
-        Uri builtUri = Uri.parse(AnywayRequestQueue.ANYWAY_BASE_URL).buildUpon()
+        Uri.Builder builder = Uri.parse(AnywayRequestQueue.ANYWAY_BASE_URL).buildUpon()
                 .appendQueryParameter("start_date", fromDate)
                 .appendQueryParameter("end_date", toDate)
                 .appendQueryParameter("show_fatal", show_fatal ? "1" : "")
@@ -579,8 +581,13 @@ public class Utility {
                 .appendQueryParameter("show_inaccurate", show_inaccurate ? "1" : "")
                 .appendQueryParameter("zoom", Integer.toString(zoomLevel))
                 .appendQueryParameter("lat", Double.toString(location.latitude))
-                .appendQueryParameter("lon", Double.toString(location.longitude))
-                .build();
+                .appendQueryParameter("lon", Double.toString(location.longitude));
+
+        for (UriQueryParamAppender filter : FiltersRepository.getFilters(context)) {
+            filter.appendQueryParameter(builder);
+        }
+
+        Uri builtUri = builder.build();
 
 
         return builtUri.toString();

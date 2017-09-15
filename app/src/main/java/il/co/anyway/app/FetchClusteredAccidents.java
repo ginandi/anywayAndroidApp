@@ -24,6 +24,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import il.co.anyway.app.filters.FiltersRepository;
+import il.co.anyway.app.filters.UriQueryParamAppender;
 import il.co.anyway.app.models.AccidentCluster;
 
 public class FetchClusteredAccidents {
@@ -84,13 +86,13 @@ public class FetchClusteredAccidents {
 
             try {
                 // Construct the URL for the Anyway cluster query
-                Uri builtUri = Uri.parse(ANYWAY_CLUSTER_URL).buildUpon()
+                Uri.Builder builder = Uri.parse(ANYWAY_CLUSTER_URL).buildUpon()
                         .appendQueryParameter("ne_lat", Double.toString(mBounds.northeast.latitude))
                         .appendQueryParameter("ne_lng", Double.toString(mBounds.northeast.longitude))
                         .appendQueryParameter("sw_lat", Double.toString(mBounds.southwest.latitude))
                         .appendQueryParameter("sw_lng", Double.toString(mBounds.southwest.longitude))
                         .appendQueryParameter("zoom", Integer.toString(mZoomLevel))
-                        .appendQueryParameter("thin_markers","true")
+                        .appendQueryParameter("thin_markers", "true")
                         .appendQueryParameter("start_date", Utility.getTimeStamp(fromDate))
                         .appendQueryParameter("end_date", Utility.getTimeStamp(toDate))
                         .appendQueryParameter("show_fatal", show_fatal ? "1" : "")
@@ -100,8 +102,14 @@ public class FetchClusteredAccidents {
 
                         // TODO add this options in user preferences
                         .appendQueryParameter("show_markers", "1")
-                        .appendQueryParameter("show_discussions", "1")
-                        .build();
+                        .appendQueryParameter("show_discussions", "1");
+
+                for (UriQueryParamAppender filter : FiltersRepository.getFilters(mCallingActivity)) {
+                    filter.appendQueryParameter(builder);
+                }
+
+
+                Uri builtUri = builder.build();
 
                 URL url = new URL(builtUri.toString());
 
