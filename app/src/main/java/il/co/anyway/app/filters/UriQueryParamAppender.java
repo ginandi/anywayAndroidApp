@@ -12,7 +12,7 @@ import android.preference.PreferenceManager;
 public abstract class UriQueryParamAppender {
 
     protected final SharedPreferences mSharedPrefs;
-    private final Context mContext;
+    protected final Context mContext;
 
     protected UriQueryParamAppender(Context context) {
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);

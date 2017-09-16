@@ -9,25 +9,24 @@ import il.co.anyway.app.R;
  * Created by gindi on 9/11/17.
  */
 
-public class UrbanicityUriQueryParamAppender extends UriQueryParamAppender {
-
-    private static final int URBAN = 2;
-    private static final int HIGHWAY = 1;
-
+public class UrbanicityUriQueryParamAppender extends BinaryUriQueryParamAppenderBase {
 
     public UrbanicityUriQueryParamAppender(Context context) {
         super(context);
     }
 
     @Override
-    public void appendQueryParameter(Uri.Builder uriBuilder) {
-        int urbanRoad =
-                mSharedPrefs.getBoolean(getString(R.string.pref_urban_road_key), true) ?
-                        URBAN : 0;
-        int highway =
-                mSharedPrefs.getBoolean(getString(R.string.pref_highway_key), true) ?
-                        HIGHWAY : 0;
+    protected String getQueryParamKey() {
+        return "show_urban";
+    }
 
-        uriBuilder.appendQueryParameter("show_urban", Integer.toString(urbanRoad | highway));
+    @Override
+    protected int getLsbPerfKey() {
+        return R.string.pref_highway_key;
+    }
+
+    @Override
+    protected int getMsbPerfKey() {
+        return R.string.pref_urban_road_key;
     }
 }

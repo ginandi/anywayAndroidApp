@@ -15,6 +15,12 @@ public class FiltersRepository {
     public static synchronized Iterable<UriQueryParamAppender> getFilters(Context context) {
         sFilters = new ArrayList<>();
         sFilters.add(new UrbanicityUriQueryParamAppender(context));
+        sFilters.add(new IntersectionUriQueryParamAppender(context));
+        sFilters.add(new NumWaysUriQueryParamAppender(context));
+        sFilters.add(new ShowDayUriQueryParamAppender(context));
+        sFilters.add(new SeverityUriQueryParamAppender(context));
+        sFilters.add(new InaccuracyUriQueryParamAppender(context));
+        sFilters.add(new DateUriQueryParamAppender(context));
 
         return sFilters;
     }
