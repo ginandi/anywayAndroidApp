@@ -86,14 +86,9 @@ public class AnywayRequestQueue {
      * @param zoom zoom level
      * @param start_date start date (timestamp as String)
      * @param end_date end date (timestamp as String)
-     * @param show_fatal show fatal accidents
-     * @param show_severe show severe accidents
-     * @param show_light show light accidents
-     * @param show_inaccurate show inaccurate accidents
      */
     public void addMarkersRequest(double ne_lat, double ne_lng, double sw_lat, double sw_lng, int zoom,
-                                  String start_date, String end_date,
-                                  boolean show_fatal, boolean show_severe, boolean show_light, boolean show_inaccurate, boolean shouldReset) {
+                                  String start_date, String end_date, boolean shouldReset) {
 
         final String DEFAULT_REQUEST_FORMAT = "json";
 
@@ -107,12 +102,6 @@ public class AnywayRequestQueue {
                 .appendQueryParameter("thin_markers", "false")
                 .appendQueryParameter("start_date", start_date)
                 .appendQueryParameter("end_date", end_date)
-                // For some odd reason, our server only handles an empty string as false.
-                // No idea why
-                .appendQueryParameter("show_fatal", show_fatal ? "1" : "")
-                .appendQueryParameter("show_severe", show_severe ? "1" : "")
-                .appendQueryParameter("show_light", show_light ? "1" : "")
-                .appendQueryParameter("show_inaccurate", show_inaccurate ? "1" : "")
                 .appendQueryParameter("format", DEFAULT_REQUEST_FORMAT)
 
                 // TODO add this options in user preferences

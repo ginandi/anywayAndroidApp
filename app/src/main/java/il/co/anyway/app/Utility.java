@@ -288,11 +288,6 @@ public class Utility {
 
         // Get preferences form SharedPreferences
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-
-        Boolean show_fatal = sharedPrefs.getBoolean(context.getString(R.string.pref_accidents_fatal_key), true);
-        Boolean show_severe = sharedPrefs.getBoolean(context.getString(R.string.pref_accidents_severe_key), true);
-        Boolean show_light = sharedPrefs.getBoolean(context.getString(R.string.pref_accidents_light_key), true);
-        Boolean show_inaccurate = sharedPrefs.getBoolean(context.getString(R.string.pref_accidents_inaccurate_key), false);
         String fromDate = sharedPrefs.getString(context.getString(R.string.pref_from_date_key), context.getString(R.string.pref_default_from_date));
         String toDate = sharedPrefs.getString(context.getString(R.string.pref_to_date_key), context.getString(R.string.pref_default_to_date));
 
@@ -304,10 +299,6 @@ public class Utility {
                 zoomLevel,
                 getTimeStamp(fromDate),
                 getTimeStamp(toDate),
-                show_fatal,
-                show_severe,
-                show_light,
-                show_inaccurate,
                 shouldReset
         );
     }
@@ -561,10 +552,6 @@ public class Utility {
     public static String getCurrentPositionStringURI(LatLng location, int zoomLevel, Context context) {
 
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-        Boolean show_fatal = sharedPrefs.getBoolean(context.getString(R.string.pref_accidents_fatal_key), true);
-        Boolean show_severe = sharedPrefs.getBoolean(context.getString(R.string.pref_accidents_severe_key), true);
-        Boolean show_light = sharedPrefs.getBoolean(context.getString(R.string.pref_accidents_light_key), true);
-        Boolean show_inaccurate = sharedPrefs.getBoolean(context.getString(R.string.pref_accidents_inaccurate_key), false);
         String fromDate = sharedPrefs.getString(context.getString(R.string.pref_from_date_key), context.getString(R.string.pref_default_from_date));
         String toDate = sharedPrefs.getString(context.getString(R.string.pref_to_date_key), context.getString(R.string.pref_default_to_date));
 
@@ -575,10 +562,6 @@ public class Utility {
         Uri.Builder builder = Uri.parse(AnywayRequestQueue.ANYWAY_BASE_URL).buildUpon()
                 .appendQueryParameter("start_date", fromDate)
                 .appendQueryParameter("end_date", toDate)
-                .appendQueryParameter("show_fatal", show_fatal ? "1" : "")
-                .appendQueryParameter("show_severe", show_severe ? "1" : "")
-                .appendQueryParameter("show_light", show_light ? "1" : "")
-                .appendQueryParameter("show_inaccurate", show_inaccurate ? "1" : "")
                 .appendQueryParameter("zoom", Integer.toString(zoomLevel))
                 .appendQueryParameter("lat", Double.toString(location.latitude))
                 .appendQueryParameter("lon", Double.toString(location.longitude));

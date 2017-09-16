@@ -777,7 +777,7 @@ public class MainActivity extends AppCompatActivity
 
         // fetch accidents from anyway or fetch from cluster decided by zoom level
         if (zoomLevel >= MINIMUM_ZOOM_LEVEL_TO_SHOW_ACCIDENTS)
-            Utility.getMarkersByParameters(bounds, zoomLevel, this, false);
+            Utility.getMarkersByParameters(bounds, zoomLevel, this, true);
         else
             new FetchClusteredAccidents(bounds, zoomLevel, this);
     }

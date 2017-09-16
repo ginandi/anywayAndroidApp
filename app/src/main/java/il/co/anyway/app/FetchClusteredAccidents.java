@@ -77,10 +77,6 @@ public class FetchClusteredAccidents {
             // Get preferences form SharedPreferences
             SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(mCallingActivity);
 
-            Boolean show_fatal = sharedPrefs.getBoolean(mCallingActivity.getString(R.string.pref_accidents_fatal_key), true);
-            Boolean show_severe = sharedPrefs.getBoolean(mCallingActivity.getString(R.string.pref_accidents_severe_key), true);
-            Boolean show_light = sharedPrefs.getBoolean(mCallingActivity.getString(R.string.pref_accidents_light_key), true);
-            Boolean show_inaccurate = sharedPrefs.getBoolean(mCallingActivity.getString(R.string.pref_accidents_inaccurate_key), false);
             String fromDate = sharedPrefs.getString(mCallingActivity.getString(R.string.pref_from_date_key), mCallingActivity.getString(R.string.pref_default_from_date));
             String toDate = sharedPrefs.getString(mCallingActivity.getString(R.string.pref_to_date_key), mCallingActivity.getString(R.string.pref_default_to_date));
 
@@ -95,10 +91,6 @@ public class FetchClusteredAccidents {
                         .appendQueryParameter("thin_markers", "true")
                         .appendQueryParameter("start_date", Utility.getTimeStamp(fromDate))
                         .appendQueryParameter("end_date", Utility.getTimeStamp(toDate))
-                        .appendQueryParameter("show_fatal", show_fatal ? "1" : "")
-                        .appendQueryParameter("show_severe", show_severe ? "1" : "")
-                        .appendQueryParameter("show_light", show_light ? "1" : "")
-                        .appendQueryParameter("show_inaccurate", show_inaccurate ? "1" : "")
 
                         // TODO add this options in user preferences
                         .appendQueryParameter("show_markers", "1")
