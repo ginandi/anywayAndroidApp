@@ -20,7 +20,7 @@
             android:layout="@layout/custom_preference_widget_layout" />
 
         <CheckBoxPreference
-            android:defaultValue="false"
+            android:defaultValue="true"
             android:key="@string/pref_accidents_inaccurate_key"
             android:title="@string/pref_title_accidents_inaccurate"
             android:layout="@layout/custom_preference_widget_layout" />
