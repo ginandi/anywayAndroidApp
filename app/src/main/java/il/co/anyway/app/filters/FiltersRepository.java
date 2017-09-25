@@ -5,9 +5,7 @@ import android.content.Context;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by gindi on 9/11/17.
- */
+
 
 public class FiltersRepository {
     private static List<UriQueryParamAppender> sFilters;

@@ -5,9 +5,7 @@ import android.net.Uri;
 
 import il.co.anyway.app.R;
 
-/**
- * Created by gindi on 9/11/17.
- */
+
 
 public class UrbanicityUriQueryParamAppender extends BinaryUriQueryParamAppenderBase {
 

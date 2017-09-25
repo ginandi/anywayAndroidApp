@@ -6,9 +6,7 @@ import android.support.annotation.NonNull;
 
 import il.co.anyway.app.R;
 
-/**
- * Created by gindi on 9/15/17.
- */
+
 
 abstract class BinaryUriQueryParamAppenderBase extends UriQueryParamAppender {
 

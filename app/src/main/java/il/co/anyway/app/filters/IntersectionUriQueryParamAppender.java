@@ -6,9 +6,7 @@ import android.net.Uri;
 import il.co.anyway.app.R;
 import il.co.anyway.app.filters.UriQueryParamAppender;
 
-/**
- * Created by gindi on 9/15/17.
- */
+
 
 public class IntersectionUriQueryParamAppender extends BinaryUriQueryParamAppenderBase {
 

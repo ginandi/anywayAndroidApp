@@ -7,9 +7,7 @@ import java.util.Map;
 
 import il.co.anyway.app.R;
 
-/**
- * Created by gindi on 9/16/17.
- */
+
 
 public class SeverityUriQueryParamAppender extends BooleansUriQueryParamAppender {
 

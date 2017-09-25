@@ -2,7 +2,6 @@ package il.co.anyway.app;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -23,9 +22,7 @@ import il.co.anyway.app.models.Accident;
 import il.co.anyway.app.singletons.MarkersManager;
 import il.co.anyway.app.singletons.OnNewAccidentListener;
 
-/**
- * Created by gindi on 9/1/17.
- */
+
 
 public class StreetViewActivity extends FragmentActivity implements
         OnStreetViewPanoramaReadyCallback,
@@ -33,14 +30,14 @@ public class StreetViewActivity extends FragmentActivity implements
         StreetViewPanorama.OnStreetViewPanoramaChangeListener,
         OnNewAccidentListener {
 
-    // 2.5 meter, 90 degrees
-
     private static final double LAT_OFFSET = 0.001;
     private static final double LNG_OFFSET = 0.001;
     private static final int NOT_IN_VIEW = -1;
     private static final double HEIGHT_OF_STREET_VIEW_CAMERA = 2.5;
     private static final double HORIZONTAL_FIELD_OF_VIEW = 90.0;
     private static final double HORIZONTAL_FIELD_OF_VIEW_RADIANS = Math.toRadians(HORIZONTAL_FIELD_OF_VIEW);
+    public static final int IMAGE_SIZE_FACTOR = 4000;
+    public static final int MIN_DISTANCE_TO_FACTOR = 20;
     private LatLng mLatLng;
     private double mBearing;
 
@@ -109,7 +106,6 @@ public class StreetViewActivity extends FragmentActivity implements
      */
     @Override
     public void onStreetViewPanoramaChange(StreetViewPanoramaLocation streetViewPanoramaLocation) {
-        Log.d("ffffff", "onStreetViewPanoramaChange");
         removeAllImages();
 
         // Clear all markers
@@ -134,7 +130,6 @@ public class StreetViewActivity extends FragmentActivity implements
 
     @Override
     public void onNewAccident(Accident a) {
-        Log.d("ffffff", "New accident!  " + a);
         possiblyShowMarker(a);
     }
 
@@ -148,8 +143,6 @@ public class StreetViewActivity extends FragmentActivity implements
         }
 
         double topPlacement = getVerticalOffset(distance, rootView);
-
-        Log.d("gggggg", "topPlacement = " + topPlacement);
 
         if (topPlacement == NOT_IN_VIEW) {
             return;
@@ -165,7 +158,6 @@ public class StreetViewActivity extends FragmentActivity implements
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(imageSize, imageSize );
         layoutParams.leftMargin = (int) leftPlacement;
         layoutParams.topMargin = (int) topPlacement;
-//        layoutParams.topMargin = rootView.getHeight() / 2;
 
         imageView.setLayoutParams(layoutParams);
         mImageViews.add(imageView);
@@ -187,29 +179,21 @@ public class StreetViewActivity extends FragmentActivity implements
     }
 
     private int getImageSize(float distance) {
-        if (distance < 20) {
-            return 200;
-        }
+        distance = Math.max(distance, MIN_DISTANCE_TO_FACTOR);
 
-        return (int) (4000 / distance);
+        return (int) (IMAGE_SIZE_FACTOR / distance);
     }
 
     private double getVerticalOffset(double distanceMeters, View rootView) {
-        Log.d("gggggg", "getVerticalOffset, distanceMeters = " + distanceMeters);
         double realAngleRadians = Math.atan(distanceMeters / HEIGHT_OF_STREET_VIEW_CAMERA);
-        Log.d("gggggg", "getVerticalOffset, realAngleRadians = " + realAngleRadians);
         double realAngleAgainstCenterRadiansTowardsDown = (Math.PI / 2.0) - realAngleRadians;
-        Log.d("gggggg", "getVerticalOffset, realAngleAgainstCenterRadiansTowardsDown = " + realAngleAgainstCenterRadiansTowardsDown);
         double verticalFieldOfViewRadians = verticalFieldOfView(rootView);
-        Log.d("gggggg", "getVerticalOffset, verticalFieldOfViewRadians = " + verticalFieldOfViewRadians + ", tilt = " + mTilt);
         double tiltRadians = Math.toRadians(mTilt);
         if (Math.abs(tiltRadians - realAngleAgainstCenterRadiansTowardsDown) > verticalFieldOfViewRadians / 2.0) {
             return NOT_IN_VIEW;
         }
 
         return rootView.getHeight() * ((tiltRadians + (0.5 * verticalFieldOfViewRadians) + realAngleAgainstCenterRadiansTowardsDown) / verticalFieldOfViewRadians);
-
-//        return (1 - (realAngleRadians / verticalFieldOfViewRadians)) * rootView.getHeight();
     }
 
     private double getHorizontalOffset(View rootView, Accident a) {
@@ -230,9 +214,6 @@ public class StreetViewActivity extends FragmentActivity implements
     private double verticalFieldOfView(View rootView) {
         double height = rootView.getHeight();
         double width = rootView.getWidth();
-        Log.d("ggggggg", "verticalFieldOfView, height = " + height + ", width = " + width);
         return (height / width) * HORIZONTAL_FIELD_OF_VIEW_RADIANS;
-
-//        return 2.0 * Math.atan((height / width) * Math.tan(HORIZONTAL_FIELD_OF_VIEW_RADIANS));
     }
 }

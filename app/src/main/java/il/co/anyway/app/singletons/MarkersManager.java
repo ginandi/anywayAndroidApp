@@ -87,10 +87,8 @@ public class MarkersManager {
             return false;
 
         if (!isAccidentExist(toAdd)) {
-            Log.d("ffffff", "adding accident");
             accidentsList.add(toAdd);
             if (mOnNewAccidentListeners != null) {
-                Log.d("ffffff", "calling listeners");
                 for (OnNewAccidentListener onNewAccidentListener : mOnNewAccidentListeners) {
                     onNewAccidentListener.onNewAccident(toAdd);
                 }
@@ -132,8 +130,6 @@ public class MarkersManager {
      * @return How many accidents from the list actually taken(duplicate accident will ignore)
      */
     public int addAllAccidents(List<Accident> toAddList, boolean reset) {
-        Log.d("ffffff", "addAllAccidents");
-
         if (reset)
             accidentsList.clear();
 

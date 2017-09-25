@@ -5,9 +5,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 
-/**
- * Created by gindi on 9/11/17.
- */
+
 
 public abstract class UriQueryParamAppender {
 
