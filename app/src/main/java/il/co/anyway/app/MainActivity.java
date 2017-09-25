@@ -251,7 +251,12 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onMapReady(GoogleMap googleMap) {
 
+        boolean isMapNullBefore = mMap == null;
         mMap = googleMap;
+
+        if (isMapNullBefore) {
+            getMarkersFromServer();
+        }
 
         // set map to start location if previous instance exist
         if (mNewInstance)
