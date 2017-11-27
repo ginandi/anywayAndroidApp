@@ -58,3 +58,16 @@ dependencies {
         exclude module: 'play-services-maps'
     }
 }
+
+task generateModel(type:Exec) {
+    workingDir '../scripts'
+    commandLine 'python', 'generate_localization.py'
+    commandLine 'python', 'generate_fields.py'
+}
+
+afterEvaluate {
+    android.applicationVariants.all { variant ->
+        variant.javaCompiler.dependsOn(generateModel)
+    }
+}
+
