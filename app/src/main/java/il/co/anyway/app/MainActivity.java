@@ -562,6 +562,11 @@ public class MainActivity extends AppCompatActivity
             return true;
         }
 
+        if (marker.getData() instanceof Accident) {
+            // Get data, but let the parent handle the rest
+            AnywayRequestQueue.getInstance(this).addAccidentAdditionalInfoRequest((Accident) marker.getData());
+        }
+
         return false;
     }
 

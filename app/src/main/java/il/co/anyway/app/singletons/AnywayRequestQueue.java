@@ -9,9 +9,11 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -34,6 +36,7 @@ public class AnywayRequestQueue {
 
     public final static String ANYWAY_BASE_URL = "http://www.anyway.co.il/";
     public final static String ANYWAY_MARKERS_BASE_URL = ANYWAY_BASE_URL + "markers?";
+    public final static String ANYWAY_MARKER_ADDITIONAL_INFO_BASE_URL = ANYWAY_BASE_URL + "markers/";
     public final static String ANYWAY_DISCUSSION_POST_URL = ANYWAY_BASE_URL + "discussion";
     public final static String ANYWAY_HIGHLIGHT_POINTS = ANYWAY_BASE_URL + "highlightpoints";
 
@@ -73,6 +76,53 @@ public class AnywayRequestQueue {
         }
 
         return instance;
+    }
+
+    public void addAccidentAdditionalInfoRequest(Accident accident) {
+        Uri.Builder builder = Uri.parse(ANYWAY_MARKER_ADDITIONAL_INFO_BASE_URL).buildUpon()
+                .appendPath(Long.toString(accident.getId()));
+
+        Uri builtUri = builder.build();
+
+        try {
+            URL url = new URL(builtUri.toString());
+            Log.d(AnywayRequestQueue.class.getSimpleName(), "Url: " + url);
+            addAccidentAdditionalInfoRequest(url.toString());
+        } catch (MalformedURLException e) {
+            Log.e(LOG_TAG, "Error building the URL: " + e.getMessage());
+        }
+    }
+
+    private void addAccidentAdditionalInfoRequest(String url) {
+        JsonArrayRequest jsObjRequest = new JsonArrayRequest
+                (Request.Method.GET, url, new Response.Listener<JSONArray>() {
+
+                    @Override
+                    public void onResponse(JSONArray response) {
+
+                        Log.d("gggggg", "got  " + response.toString());
+
+//                        List<Accident> fetchedAccidents = new ArrayList<>();
+//                        List<Discussion> fetchedDiscussion = new ArrayList<>();
+//
+//                        int fetchStatus = Utility.getMarkersDataFromJson(response, fetchedAccidents, fetchedDiscussion);
+//
+//                        if (fetchStatus == 0) {
+//                            MarkersManager.getInstance().addAllAccidents(fetchedAccidents, shouldReset);
+//                            MarkersManager.getInstance().addAllDiscussions(fetchedDiscussion, shouldReset);
+//                        }
+
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("gggggg", error.toString());
+                    }
+                });
+
+        // Add the request to the RequestQueue.
+        mRequestQueue.add(jsObjRequest);
     }
 
     /**

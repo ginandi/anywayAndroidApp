@@ -3,7 +3,9 @@ package il.co.anyway.app.models;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class Accident {
 
@@ -51,6 +53,7 @@ public class Accident {
     private String address;
     private int locationAccuracy;
     private boolean markerAddedToMap;
+    private List<AdditionalParameter> additionalParameters = new ArrayList<>();
 
     public Accident(long id, String title, String description, int type, int subType, int severity,
                     Date created, LatLng location, String address, int locationAccuracy) {
@@ -152,6 +155,14 @@ public class Accident {
         return this;
     }
 
+    public List<AdditionalParameter> getAdditionalParameters() {
+        return additionalParameters;
+    }
+
+    public void addAdditionalParameters(AdditionalParameter additionalParameter) {
+        this.additionalParameters.add(additionalParameter);
+    }
+
     public String getAddress() {
         return address;
     }
@@ -182,5 +193,17 @@ public class Accident {
     @Override
     public String toString() {
         return String.format("Accident %s is in %s", title, location);
+    }
+
+    public static class AdditionalParameter {
+        public final String key;
+        public final String Name;
+        public final String Value;
+
+        public AdditionalParameter(String key, String name, String value) {
+            this.key = key;
+            Name = name;
+            Value = value;
+        }
     }
 }

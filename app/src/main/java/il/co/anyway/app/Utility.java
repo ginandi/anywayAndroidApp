@@ -28,12 +28,16 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import il.co.anyway.app.filters.FiltersRepository;
 import il.co.anyway.app.filters.UriQueryParamAppender;
 import il.co.anyway.app.models.Accident;
+import il.co.anyway.app.models.Accident.AdditionalParameter;
 import il.co.anyway.app.models.Discussion;
+import il.co.anyway.app.models.FieldNames;
+import il.co.anyway.app.models.Localization;
 import il.co.anyway.app.singletons.AnywayRequestQueue;
 
 public class Utility {
@@ -256,7 +260,7 @@ public class Utility {
             Integer subtype = accidentJsonObject.getInt(ACCIDENT_SUBTYPE);
 
             // create new Accident object and set parameters
-            return new Accident()
+            Accident accident = new Accident()
                     .setId(id)
                     .setTitle(title)
                     .setDescription(desc)
@@ -267,6 +271,27 @@ public class Utility {
                     .setLocation(new LatLng(lat, lng))
                     .setAddress(address)
                     .setLocationAccuracy(accuracy);
+
+            JSONArray keys = accidentJsonObject.names();
+            for (int j = 0; j < keys.length(); j++) {
+                String key = keys.getString(j);
+                if (!FieldNames.map.containsKey(key)) {
+                    continue;
+                }
+                int value = accidentJsonObject.getInt(key);
+                String localizedKeyInEnglish = FieldNames.map.get(key);
+                String localizedKeyInHebrew = Localization.localizedNames.get(localizedKeyInEnglish);
+                HashMap<Integer, String> possibleValues = Localization.values.get(localizedKeyInEnglish);
+                if (possibleValues == null) {
+                    continue;
+                }
+                String actualValue = possibleValues.get(value);
+                if (actualValue != null) {
+                    accident.addAdditionalParameters(new AdditionalParameter(key, localizedKeyInHebrew, actualValue));
+                }
+            }
+
+            return accident;
 
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage());

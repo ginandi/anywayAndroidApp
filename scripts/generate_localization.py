@@ -6,9 +6,10 @@ def print_out(str=''):
 	buff.append(('\t' * number_tabs) + str)
 
 name_regex = re.compile('\s+\"([A-Z_]+)\":\s+{.*')
-value_regex = re.compile('\s+(\d+):\s+\"(.*)\",.*')
+# value_regex = re.compile('\s+(\d+):\s+\"(.*)\",.*')
+value_regex = re.compile('\s+\"(\d+)\"\s*:\s+\"(.*)\",.*')
 
-localized_names_regex = re.compile('\s+.*\"([A-Z_0-9]+)\":\s+\"(.*)\".*')
+localized_names_regex = re.compile('\s+.*\"([A-Z_]+[0-9]*)\":\s+\"(.*)\".*')
 
 print_out('package il.co.anyway.app.models;')
 print_out()
@@ -23,7 +24,7 @@ print_out('public static Map<String, HashMap<Integer, String>> values = new Hash
 print_out('public static Map<String, String> localizedNames = new HashMap<>();')
 print_out('static {')
 number_tabs = number_tabs + 1
-lines = urllib2.urlopen('https://raw.githubusercontent.com/hasadna/anyway/dev/anyway/localization.py')
+lines = urllib2 .urlopen('https://raw.githubusercontent.com/hasadna/anyway/dev/static/js/localization.js')
 first = True
 for line in lines:
 	name_match = name_regex.match(line)
@@ -46,7 +47,7 @@ for line in lines:
 print_out("}}); ")
 number_tabs = number_tabs - 1
 
-lines = urllib2.urlopen('https://raw.githubusercontent.com/hasadna/anyway/dev/anyway/localization.py')
+lines = urllib2.urlopen('https://raw.githubusercontent.com/hasadna/anyway/dev/static/js/localization.js')
 for line in lines:
 	localized_name_match = localized_names_regex.match(line)
 	if (localized_name_match):
