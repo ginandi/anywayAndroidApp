@@ -44,6 +44,26 @@ for line in lines:
 		print_out('put(' + index + ', "' + name + '");' )
 		number_tabs = number_tabs - 1
 
+lines = urllib2 .urlopen('https://raw.githubusercontent.com/hasadna/anyway/dev/static/js/inv_dict.js')
+for line in lines:
+	name_match = name_regex.match(line)
+	if (name_match):
+		name = name_match.group(1)
+		if (first):
+			first = False
+		else:
+			print_out("}}); ")
+		print_out('values.put("' + name + '", new HashMap<Integer, String>() {{')
+
+	value_match = value_regex.match(line)
+	if (value_match):
+		index = value_match.group(1)
+		name = value_match.group(2)
+		number_tabs = number_tabs + 1
+		print_out('put(' + index + ', "' + name + '");' )
+		number_tabs = number_tabs - 1
+
+
 print_out("}}); ")
 number_tabs = number_tabs - 1
 

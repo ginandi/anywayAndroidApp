@@ -1,0 +1,492 @@
+From f5a980629410145a4355d3c8703f248f261f57f9 Mon Sep 17 00:00:00 2001
+From: Omri Gindi <gindi@fb.com>
+Date: Mon, 27 Nov 2017 21:14:21 +0200
+Subject: [PATCH 1/2] Generate models for accident information
+
+---
+ app/build.gradle                                   |  13 ++
+ .../java/il/co/anyway/app/models/FieldNames.java   |  84 ++++++++
+ .../java/il/co/anyway/app/models/Localization.java | 236 +++++++++++++++++++++
+ scripts/generate_fields.py                         |  39 ++++
+ scripts/generate_localization.py                   |  65 ++++++
+ 5 files changed, 437 insertions(+)
+ create mode 100644 app/src/main/java/il/co/anyway/app/models/FieldNames.java
+ create mode 100644 app/src/main/java/il/co/anyway/app/models/Localization.java
+ create mode 100644 scripts/generate_fields.py
+ create mode 100644 scripts/generate_localization.py
+
+diff --git a/app/build.gradle b/app/build.gradle
+index c26907d..18ff415 100644
+--- a/app/build.gradle
++++ b/app/build.gradle
+@@ -58,3 +58,16 @@ dependencies {
+         exclude module: 'play-services-maps'
+     }
+ }
++
++task generateModel(type:Exec) {
++    workingDir '../scripts'
++    commandLine 'python', 'generate_localization.py'
++    commandLine 'python', 'generate_fields.py'
++}
++
++afterEvaluate {
++    android.applicationVariants.all { variant ->
++        variant.javaCompiler.dependsOn(generateModel)
++    }
++}
++
+diff --git a/app/src/main/java/il/co/anyway/app/models/FieldNames.java b/app/src/main/java/il/co/anyway/app/models/FieldNames.java
+new file mode 100644
+index 0000000..74293c1
+--- /dev/null
++++ b/app/src/main/java/il/co/anyway/app/models/FieldNames.java
+@@ -0,0 +1,84 @@
++package il.co.anyway.app.models;
++
++import java.util.HashMap;
++import java.util.Map;
++
++/** Generated file, do not modify manually **/
++
++public class FieldNames {
++	public static Map<String, String> map = new HashMap<>();
++	static {
++		map.put("settlement", "ISHUV");
++		map.put("junction_name", "SHEM_ZOMET");
++		map.put("settlement_sign", "SEMEL_YISHUV");
++		map.put("street_sign", "SEMEL_RECHOV");
++		map.put("street_name", "SHEM_RECHOV");
++		map.put("table_number", "MS_TAVLA");
++		map.put("code", "KOD");
++		map.put("name", "NAME");
++		map.put("sign", "SEMEL");
++		map.put("urban_intersection", "ZOMET_IRONI");
++		map.put("non_urban_intersection", "ZOMET_LO_IRONI");
++		map.put("accident_year", "SHNAT_TEUNA");
++		map.put("accident_month", "HODESH_TEUNA");
++		map.put("accident_day", "YOM_BE_HODESH");
++		map.put("accident_hour", "SHAA");
++		map.put("x_coordinate", "X");
++		map.put("y_coordinate", "Y");
++		map.put("accident_type", "SUG_TEUNA");
++		map.put("accident_severity", "HUMRAT_TEUNA");
++		map.put("igun", "STATUS_IGUN");
++		map.put("id", "PK_TEUNA_FIKT");
++		map.put("home", "BAYIT");
++		map.put("road_type", "SUG_DEREH");
++		map.put("day_type", "SUG_YOM");
++		map.put("road_shape", "ZURAT_DEREH");
++		map.put("unit", "YEHIDA");
++		map.put("one_lane", "HAD_MASLUL");
++		map.put("multi_lane", "RAV_MASLUL");
++		map.put("speed_limit", "MEHIRUT_MUTERET");
++		map.put("intactness", "TKINUT");
++		map.put("road_width", "ROHAV");
++		map.put("road_sign", "SIMUN_TIMRUR");
++		map.put("road_light", "TEURA");
++		map.put("road_control", "BAKARA");
++		map.put("weather", "MEZEG_AVIR");
++		map.put("road_surface", "PNE_KVISH");
++		map.put("road_object", "SUG_EZEM");
++		map.put("object_distance", "MERHAK_EZEM");
++		map.put("didnt_cross", "LO_HAZA");
++		map.put("cross_mode", "OFEN_HAZIYA");
++		map.put("cross_location", "MEKOM_HAZIYA");
++		map.put("cross_direction", "KIVUN_HAZIYA");
++		map.put("involved_type", "SUG_MEORAV");
++		map.put("license_acquiring_date", "SHNAT_HOZAA");
++		map.put("age_group", "KVUZA_GIL");
++		map.put("sex", "MIN");
++		map.put("car_type", "SUG_REHEV_NASA_LMS");
++		map.put("safety_measures", "EMZAE_BETIHUT");
++		map.put("home_city", "SEMEL_YISHUV_MEGURIM");
++		map.put("injury_severity", "HUMRAT_PGIA");
++		map.put("injured_type", "SUG_NIFGA_LMS");
++		map.put("injured_position", "PEULAT_NIFGA_LMS");
++		map.put("population_type", "KVUTZAT_OHLUSIYA_LMS");
++		map.put("home_district", "MAHOZ_MEGURIM");
++		map.put("home_nafa", "NAFA_MEGURIM");
++		map.put("home_area", "EZOR_TIVI_MEGURIM");
++		map.put("home_municipal_status", "MAAMAD_MINIZIPALI_MEGURIM");
++		map.put("home_residence_type", "ZURAT_ISHUV_MEGURIM");
++		map.put("file_type", "SUG_TIK");
++		map.put("hospital_time", "PAZUAUSHPAZ_LMS");
++		map.put("medical_type", "ISS_LMS");
++		map.put("release_dest", "YAADSHIHRUR_PUF_LMS");
++		map.put("safety_measures_use", "SHIMUSHBEAVIZAREYBETIHUT_LMS");
++		map.put("late_deceased", "PTIRAMEUHERET_LMS");
++		map.put("engine_volume", "NEFAH");
++		map.put("manufacturing_year", "SHNAT_YITZUR");
++		map.put("driving_directions", "KIVUNE_NESIA");
++		map.put("vehicle_status", "MATZAV_REHEV");
++		map.put("vehicle_attribution", "SHIYUH_REHEV_LMS");
++		map.put("vehicle_type", "SUG_REHEV_LMS");
++		map.put("seats", "MEKOMOT_YESHIVA_LMS");
++		map.put("total_weight", "MISHKAL_KOLEL_LMS");
++	}
++}
+\ No newline at end of file
+diff --git a/app/src/main/java/il/co/anyway/app/models/Localization.java b/app/src/main/java/il/co/anyway/app/models/Localization.java
+new file mode 100644
+index 0000000..d87d458
+--- /dev/null
++++ b/app/src/main/java/il/co/anyway/app/models/Localization.java
+@@ -0,0 +1,236 @@
++package il.co.anyway.app.models;
++
++import java.util.HashMap;
++import java.util.Map;
++
++/** Generated file, do not modify manually **/
++
++public class Localization {
++	public static Map<String, HashMap<Integer, String>> values = new HashMap<>();
++	public static Map<String, String> localizedNames = new HashMap<>();
++	static {
++		values.put("SUG_DEREH", new HashMap<Integer, String>() {{
++			put(1, "עירוני בצומת");
++			put(2, "עירוני לא בצומת");
++			put(3, "לא עירוני בצומת");
++			put(4, "לא עירוני לא בצומת");
++		}}); 
++		values.put("YEHIDA", new HashMap<Integer, String>() {{
++			put(11, "מרחב חוף (חיפה)");
++			put(12, "מרחב גליל");
++			put(14, "מרחב עמקים");
++			put(20, "מרחב ת\"א");
++			put(33, "מרחב אילת");
++			put(34, "מרחב הנגב");
++			put(36, "מרחב שמשון (עד 1999)");
++			put(37, "מרחב שמשון (החל ב-2004)");
++			put(38, "מרחב לכיש");
++			put(41, "מרחב שומרון");
++			put(43, "מרחב יהודה");
++			put(51, "מרחב השרון");
++			put(52, "מרחב השפלה");
++			put(61, "מחוז ירושלים");
++		}}); 
++		values.put("SUG_YOM", new HashMap<Integer, String>() {{
++			put(1, "חג");
++			put(2, "ערב חג");
++			put(3, "חול המועד");
++			put(4, "יום אחר");
++		}}); 
++		values.put("HUMRAT_TEUNA", new HashMap<Integer, String>() {{
++			put(1, "קטלנית");
++			put(2, "קשה");
++			put(3, "קלה");
++		}}); 
++		values.put("SUG_TEUNA", new HashMap<Integer, String>() {{
++			put(1, "פגיעה בהולך רגל");
++			put(2, "התנגשות חזית אל צד");
++			put(3, "התנגשות חזית באחור");
++			put(4, "התנגשות צד בצד");
++			put(5, "התנגשות חזית אל חזית");
++			put(6, "התנגשות עם רכב שנעצר ללא חניה");
++			put(7, "התנגשות עם רכב חונה");
++			put(8, "התנגשות עם עצם דומם");
++			put(9, "ירידה מהכביש או עלייה למדרכה");
++			put(10, "התהפכות");
++			put(11, "החלקה");
++			put(12, "פגיעה בנוסע בתוך כלי רכב");
++			put(13, "נפילה ברכב נע");
++			put(14, "שריפה");
++			put(15, "אחר");
++			put(17, "התנגשות אחור אל חזית");
++			put(18, "התנגשות אחור אל צד");
++			put(19, "התנגשות עם בעל חיים");
++			put(20, "פגיעה ממטען של רכב");
++		}}); 
++		values.put("ZURAT_DEREH", new HashMap<Integer, String>() {{
++			put(1, "כניסה למחלף");
++			put(2, "ביציאה ממחלף");
++			put(3, "מ.חניה/ת. דלק");
++			put(4, "שיפוע תלול");
++			put(5, "עקום חד");
++			put(6, "על גשר מנהרה");
++			put(7, "מפגש מסילת ברזל");
++			put(8, "כביש ישר/צומת");
++			put(9, "אחר");
++		}}); 
++		values.put("HAD_MASLUL", new HashMap<Integer, String>() {{
++			put(1, "חד סיטרי");
++			put(2, "דו סיטרי+קו הפרדה רצוף");
++			put(3, "דו סיטרי אין קו הפרדה רצוף");
++			put(4, "אחר");
++		}}); 
++		values.put("RAV_MASLUL", new HashMap<Integer, String>() {{
++			put(1, "מיפרדה מסומנת בצבע");
++			put(2, "מיפרדה עם גדר בטיחות");
++			put(3, "מיפרדה בנויה ללא גדר בטיחות");
++			put(4, "מיפרדה לא בנויה");
++			put(5, "אחר");
++		}}); 
++		values.put("MEHIRUT_MUTERET", new HashMap<Integer, String>() {{
++			put(1, "עד 50 קמ\"ש");
++			put(2, "60 קמ\"ש");
++			put(3, "70 קמ\"ש");
++			put(4, "80 קמ\"ש");
++			put(5, "90 קמ\"ש");
++			put(6, "100 קמ\"ש");
++		}}); 
++		values.put("TKINUT", new HashMap<Integer, String>() {{
++			put(1, "אין ליקוי");
++			put(2, "שוליים גרועים");
++			put(3, "כביש משובש");
++			put(4, "שוליים גרועים וכביש משובש");
++		}}); 
++		values.put("ROHAV", new HashMap<Integer, String>() {{
++			put(1, "עד 5 מטר");
++			put(2, "5 עד 7");
++			put(3, "7 עד 10.5");
++			put(4, "10.5 עד 14");
++			put(5, "יותר מ-14");
++		}}); 
++		values.put("SIMUN_TIMRUR", new HashMap<Integer, String>() {{
++			put(1, "סימון לקוי/חסר");
++			put(2, "תימרור לקוי/חסר");
++			put(3, "אין ליקוי");
++			put(4, "לא נדרש תמרור");
++		}}); 
++		values.put("TEURA", new HashMap<Integer, String>() {{
++			put(1, "אור יום רגיל");
++			put(2, "ראות מוגבלת עקב מזג אויר (עשן,ערפל)");
++			put(3, "לילה פעלה תאורה");
++			put(4, "קיימת תאורה בלתי תקינה/לא פועלת");
++			put(5, "לילה לא קיימת תאורה");
++		}}); 
++		values.put("BAKARA", new HashMap<Integer, String>() {{
++			put(1, "אין בקרה");
++			put(2, "רמזור תקין");
++			put(3, "רמזור מהבהב צהוב");
++			put(4, "רמזור לא תקין");
++			put(5, "תמרור עצור");
++			put(6, "תמרור זכות קדימה");
++			put(7, "אחר");
++		}}); 
++		values.put("MEZEG_AVIR", new HashMap<Integer, String>() {{
++			put(1, "בהיר");
++			put(2, "גשום");
++			put(3, "שרבי");
++			put(4, "ערפילי");
++			put(5, "אחר");
++		}}); 
++		values.put("PNE_KVISH", new HashMap<Integer, String>() {{
++			put(1, "יבש");
++			put(2, "רטוב ממים");
++			put(3, "מרוח בחומר דלק");
++			put(4, "מכוסה בבוץ");
++			put(5, "חול או חצץ על הכביש");
++			put(6, "אחר");
++		}}); 
++		values.put("SUG_EZEM", new HashMap<Integer, String>() {{
++			put(1, "עץ");
++			put(2, "עמוד חשמל/תאורה/טלפון");
++			put(3, "תמרור ושלט");
++			put(4, "גשר סימניו ומגיניו");
++			put(5, "מבנה");
++			put(6, "גדר בטיחות לרכב");
++			put(7, "חבית");
++			put(8, "אחר");
++		}}); 
++		values.put("MERHAK_EZEM", new HashMap<Integer, String>() {{
++			put(1, "עד מטר");
++			put(2, "1-3 מטר");
++			put(3, "על הכביש");
++			put(4, "על שטח הפרדה");
++		}}); 
++		values.put("LO_HAZA", new HashMap<Integer, String>() {{
++			put(1, "הלך בכיוון התנועה");
++			put(2, "הלך נגד");
++			put(3, "שיחק על הכביש");
++			put(4, "עמד על הכביש");
++			put(5, "היה על אי הפרדה");
++			put(6, "היה על שוליים/מדרכה");
++			put(7, "אחר");
++		}}); 
++		values.put("OFEN_HAZIYA", new HashMap<Integer, String>() {{
++			put(1, "התפרץ אל הכביש");
++			put(2, "חצה שהוא מוסתר");
++			put(3, "חצה רגיל");
++			put(4, "אחר");
++		}}); 
++		values.put("MEKOM_HAZIYA", new HashMap<Integer, String>() {{
++			put(1, "לא במעבר חציה ליד צומת");
++			put(2, "לא במעבר חציה לא ליד צומת");
++			put(3, "במעבר חציה בלי רמזור");
++			put(4, "במעבר חציה עם רמזור");
++		}}); 
++		values.put("KIVUN_HAZIYA", new HashMap<Integer, String>() {{
++			put(1, "מימין לשמאל");
++			put(2, "משמאל לימין");
++		}}); 
++		values.put("STATUS_IGUN", new HashMap<Integer, String>() {{
++			put(1, "עיגון מדויק");
++			put(2, "מרכז ישוב");
++			put(3, "מרכז דרך");
++			put(4, "מרכז קילומטר");
++			put(9, "לא עוגן");
++		}}); 
++	localizedNames.put("SUG_DEREH", "סוג דרך");
++	localizedNames.put("SHEM_ZOMET", "שם צומת");
++	localizedNames.put("SEMEL_YISHUV", "ישוב");
++	localizedNames.put("REHOV1", "רחוב 1");
++	localizedNames.put("REHOV2", "רחוב 2");
++	localizedNames.put("BAYIT", "מספר בית");
++	localizedNames.put("ZOMET_IRONI", "צומת עירוני");
++	localizedNames.put("KVISH1", "כביש 1");
++	localizedNames.put("KVISH2", "כביש 2");
++	localizedNames.put("ZOMET_LO_IRONI", "צומת לא עירוני");
++	localizedNames.put("YEHIDA", "יחידה");
++	localizedNames.put("SUG_YOM", "סוג יום");
++	localizedNames.put("RAMZOR", "רמזור");
++	localizedNames.put("HUMRAT_TEUNA", "חומרת תאונה");
++	localizedNames.put("SUG_TEUNA", "סוג תאונה");
++	localizedNames.put("ZURAT_DEREH", "צורת דרך");
++	localizedNames.put("HAD_MASLUL", "חד מסלול");
++	localizedNames.put("RAV_MASLUL", "רב מסלול");
++	localizedNames.put("MEHIRUT_MUTERET", "מהירות מותרת");
++	localizedNames.put("TKINUT", "תקינות");
++	localizedNames.put("ROHAV", "רוחב");
++	localizedNames.put("SIMUN_TIMRUR", "סימון תמרור");
++	localizedNames.put("TEURA", "תאורה");
++	localizedNames.put("BAKARA", "בקרה");
++	localizedNames.put("MEZEG_AVIR", "מזג אוויר");
++	localizedNames.put("MEZEG_AVIR_UNITED", "מזג אוויר");
++	localizedNames.put("PNE_KVISH", "פני כביש");
++	localizedNames.put("SUG_EZEM", "סוג עצם");
++	localizedNames.put("MERHAK_EZEM", "מרחק עצם");
++	localizedNames.put("LO_HAZA", "לא חצה");
++	localizedNames.put("OFEN_HAZIYA", "אופן חציה");
++	localizedNames.put("MEKOM_HAZIYA", "מקום חציה");
++	localizedNames.put("KIVUN_HAZIYA", "כיוון חציה");
++	localizedNames.put("STATUS_IGUN", "עיגון");
++	localizedNames.put("MAHOZ", "מחוז");
++	localizedNames.put("NAFA", "נפה");
++	localizedNames.put("EZOR_TIVI", "אזור טבעי");
++	localizedNames.put("MAAMAD_MINIZIPALI", "מעמד מוניציפלי");
++	localizedNames.put("ZURAT_ISHUV", "צורת יישוב");
++	}
++}
+\ No newline at end of file
+diff --git a/scripts/generate_fields.py b/scripts/generate_fields.py
+new file mode 100644
+index 0000000..ec57018
+--- /dev/null
++++ b/scripts/generate_fields.py
+@@ -0,0 +1,39 @@
++import re, urllib2
++
++line_regex = re.compile('\s*([a-z0-9_]+).*\"([A-Z_]+)\".*')
++
++number_tabs = 0
++buff = []
++def print_out(str=''):
++	# print ('\t' * number_tabs) + str
++	buff.append(('\t' * number_tabs) + str)
++
++print_out('package il.co.anyway.app.models;')
++print_out()
++print_out('import java.util.HashMap;')
++print_out('import java.util.Map;')
++print_out()
++print_out('/** Generated file, do not modify manually **/')
++print_out()
++print_out('public class FieldNames {')
++number_tabs = number_tabs + 1
++print_out('public static Map<String, String> map = new HashMap<>();')
++print_out('static {')
++number_tabs = number_tabs + 1
++
++lines = urllib2.urlopen('https://raw.githubusercontent.com/hasadna/anyway/dev/anyway/field_names.py')
++for line in lines:
++	field_match = line_regex.match(line)
++	if (field_match):
++		field_name = field_match.group(1)
++		field_value = field_match.group(2)
++		print_out('map.put("' + field_name + '", "' + field_value + '");')
++
++number_tabs = number_tabs - 1
++print_out('}')
++number_tabs = number_tabs - 1
++print_out('}')
++
++with open("../app/src/main/java/il/co/anyway/app/models/FieldNames.java", "w") as text_file:
++	text_file.write('\n'.join(buff))
++	text_file.close()
+diff --git a/scripts/generate_localization.py b/scripts/generate_localization.py
+new file mode 100644
+index 0000000..98c73cd
+--- /dev/null
++++ b/scripts/generate_localization.py
+@@ -0,0 +1,65 @@
++import re, urllib2
++
++number_tabs = 0
++buff = []
++def print_out(str=''):
++	buff.append(('\t' * number_tabs) + str)
++
++name_regex = re.compile('\s+\"([A-Z_]+)\":\s+{.*')
++value_regex = re.compile('\s+(\d+):\s+\"(.*)\",.*')
++
++localized_names_regex = re.compile('\s+.*\"([A-Z_0-9]+)\":\s+\"(.*)\".*')
++
++print_out('package il.co.anyway.app.models;')
++print_out()
++print_out('import java.util.HashMap;')
++print_out('import java.util.Map;')
++print_out()
++print_out('/** Generated file, do not modify manually **/')
++print_out()
++print_out('public class Localization {')
++number_tabs = number_tabs + 1
++print_out('public static Map<String, HashMap<Integer, String>> values = new HashMap<>();')
++print_out('public static Map<String, String> localizedNames = new HashMap<>();')
++print_out('static {')
++number_tabs = number_tabs + 1
++lines = urllib2.urlopen('https://raw.githubusercontent.com/hasadna/anyway/dev/anyway/localization.py')
++first = True
++for line in lines:
++	name_match = name_regex.match(line)
++	if (name_match):
++		name = name_match.group(1)
++		if (first):
++			first = False
++		else:
++			print_out("}}); ")
++		print_out('values.put("' + name + '", new HashMap<Integer, String>() {{')
++
++	value_match = value_regex.match(line)
++	if (value_match):
++		index = value_match.group(1)
++		name = value_match.group(2)
++		number_tabs = number_tabs + 1
++		print_out('put(' + index + ', "' + name + '");' )
++		number_tabs = number_tabs - 1
++
++print_out("}}); ")
++number_tabs = number_tabs - 1
++
++lines = urllib2.urlopen('https://raw.githubusercontent.com/hasadna/anyway/dev/anyway/localization.py')
++for line in lines:
++	localized_name_match = localized_names_regex.match(line)
++	if (localized_name_match):
++		unlocalized= localized_name_match.group(1)
++		localized = localized_name_match.group(2)
++		print_out('localizedNames.put("' + unlocalized + '", "' + localized + '");')
++
++
++print_out('}')
++
++number_tabs = number_tabs - 1
++print_out('}')
++
++with open("../app/src/main/java/il/co/anyway/app/models/Localization.java", "w") as text_file:
++	text_file.write('\n'.join(buff))
++	text_file.close()
+\ No newline at end of file
+-- 
+2.13.5
+

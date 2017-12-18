@@ -87,18 +87,22 @@ public class AnywayRequestQueue {
         try {
             URL url = new URL(builtUri.toString());
             Log.d(AnywayRequestQueue.class.getSimpleName(), "Url: " + url);
-            addAccidentAdditionalInfoRequest(url.toString());
+            addAccidentAdditionalInfoRequest(url.toString(), accident);
         } catch (MalformedURLException e) {
             Log.e(LOG_TAG, "Error building the URL: " + e.getMessage());
         }
     }
 
-    private void addAccidentAdditionalInfoRequest(String url) {
+    private void addAccidentAdditionalInfoRequest(String url, final Accident accident) {
         JsonArrayRequest jsObjRequest = new JsonArrayRequest
                 (Request.Method.GET, url, new Response.Listener<JSONArray>() {
 
                     @Override
                     public void onResponse(JSONArray response) {
+                        for (int i = 0; i < response.length(); i++) {
+                            
+                        }
+
 
                         Log.d("gggggg", "got  " + response.toString());
 

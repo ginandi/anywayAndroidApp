@@ -1,0 +1,436 @@
+From 4905f4f84c448092aec8ba02213b912e60e18541 Mon Sep 17 00:00:00 2001
+From: Omri Gindi <gindi@fb.com>
+Date: Mon, 4 Dec 2017 20:39:05 +0200
+Subject: [PATCH 2/2] Read the additional params into the accident
+
+---
+ app/app.iml                                        |   2 -
+ .../main/java/il/co/anyway/app/MainActivity.java   |   5 +
+ app/src/main/java/il/co/anyway/app/Utility.java    |  27 ++++-
+ .../java/il/co/anyway/app/models/Accident.java     |  23 ++++
+ .../java/il/co/anyway/app/models/Localization.java | 122 ++++++++++++++++++++-
+ .../anyway/app/singletons/AnywayRequestQueue.java  |  50 +++++++++
+ scripts/generate_localization.py                   |   9 +-
+ 7 files changed, 229 insertions(+), 9 deletions(-)
+
+diff --git a/app/app.iml b/app/app.iml
+index 63a825f..0e779f8 100644
+--- a/app/app.iml
++++ b/app/app.iml
+@@ -99,10 +99,8 @@
+       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/split-apk" />
+       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/splits-support" />
+       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/symbols" />
+-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/tmp" />
+       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/transforms" />
+       <excludeFolder url="file://$MODULE_DIR$/build/outputs" />
+-      <excludeFolder url="file://$MODULE_DIR$/build/reports" />
+       <excludeFolder url="file://$MODULE_DIR$/build/tmp" />
+     </content>
+     <orderEntry type="jdk" jdkName="Android API 22 Platform" jdkType="Android SDK" />
+diff --git a/app/src/main/java/il/co/anyway/app/MainActivity.java b/app/src/main/java/il/co/anyway/app/MainActivity.java
+index 6b011ff..abfaeb0 100644
+--- a/app/src/main/java/il/co/anyway/app/MainActivity.java
++++ b/app/src/main/java/il/co/anyway/app/MainActivity.java
+@@ -562,6 +562,11 @@ public class MainActivity extends AppCompatActivity
+             return true;
+         }
+ 
++        if (marker.getData() instanceof Accident) {
++            // Get data, but let the parent handle the rest
++            AnywayRequestQueue.getInstance(this).addAccidentAdditionalInfoRequest((Accident) marker.getData());
++        }
++
+         return false;
+     }
+ 
+diff --git a/app/src/main/java/il/co/anyway/app/Utility.java b/app/src/main/java/il/co/anyway/app/Utility.java
+index c8050a9..fa7d76d 100644
+--- a/app/src/main/java/il/co/anyway/app/Utility.java
++++ b/app/src/main/java/il/co/anyway/app/Utility.java
+@@ -28,12 +28,16 @@ import java.sql.Timestamp;
+ import java.text.ParseException;
+ import java.text.SimpleDateFormat;
+ import java.util.Date;
++import java.util.HashMap;
+ import java.util.List;
+ 
+ import il.co.anyway.app.filters.FiltersRepository;
+ import il.co.anyway.app.filters.UriQueryParamAppender;
+ import il.co.anyway.app.models.Accident;
++import il.co.anyway.app.models.Accident.AdditionalParameter;
+ import il.co.anyway.app.models.Discussion;
++import il.co.anyway.app.models.FieldNames;
++import il.co.anyway.app.models.Localization;
+ import il.co.anyway.app.singletons.AnywayRequestQueue;
+ 
+ public class Utility {
+@@ -256,7 +260,7 @@ public class Utility {
+             Integer subtype = accidentJsonObject.getInt(ACCIDENT_SUBTYPE);
+ 
+             // create new Accident object and set parameters
+-            return new Accident()
++            Accident accident = new Accident()
+                     .setId(id)
+                     .setTitle(title)
+                     .setDescription(desc)
+@@ -268,6 +272,27 @@ public class Utility {
+                     .setAddress(address)
+                     .setLocationAccuracy(accuracy);
+ 
++            JSONArray keys = accidentJsonObject.names();
++            for (int j = 0; j < keys.length(); j++) {
++                String key = keys.getString(j);
++                if (!FieldNames.map.containsKey(key)) {
++                    continue;
++                }
++                int value = accidentJsonObject.getInt(key);
++                String localizedKeyInEnglish = FieldNames.map.get(key);
++                String localizedKeyInHebrew = Localization.localizedNames.get(localizedKeyInEnglish);
++                HashMap<Integer, String> possibleValues = Localization.values.get(localizedKeyInEnglish);
++                if (possibleValues == null) {
++                    continue;
++                }
++                String actualValue = possibleValues.get(value);
++                if (actualValue != null) {
++                    accident.addAdditionalParameters(new AdditionalParameter(key, localizedKeyInHebrew, actualValue));
++                }
++            }
++
++            return accident;
++
+         } catch (JSONException e) {
+             Log.e(LOG_TAG, e.getMessage());
+             return null;
+diff --git a/app/src/main/java/il/co/anyway/app/models/Accident.java b/app/src/main/java/il/co/anyway/app/models/Accident.java
+index 5eb94b7..7b170c0 100644
+--- a/app/src/main/java/il/co/anyway/app/models/Accident.java
++++ b/app/src/main/java/il/co/anyway/app/models/Accident.java
+@@ -3,7 +3,9 @@ package il.co.anyway.app.models;
+ import com.google.android.gms.maps.model.LatLng;
+ 
+ import java.text.SimpleDateFormat;
++import java.util.ArrayList;
+ import java.util.Date;
++import java.util.List;
+ 
+ public class Accident {
+ 
+@@ -51,6 +53,7 @@ public class Accident {
+     private String address;
+     private int locationAccuracy;
+     private boolean markerAddedToMap;
++    private List<AdditionalParameter> additionalParameters = new ArrayList<>();
+ 
+     public Accident(long id, String title, String description, int type, int subType, int severity,
+                     Date created, LatLng location, String address, int locationAccuracy) {
+@@ -152,6 +155,14 @@ public class Accident {
+         return this;
+     }
+ 
++    public List<AdditionalParameter> getAdditionalParameters() {
++        return additionalParameters;
++    }
++
++    public void addAdditionalParameters(AdditionalParameter additionalParameter) {
++        this.additionalParameters.add(additionalParameter);
++    }
++
+     public String getAddress() {
+         return address;
+     }
+@@ -183,4 +194,16 @@ public class Accident {
+     public String toString() {
+         return String.format("Accident %s is in %s", title, location);
+     }
++
++    public static class AdditionalParameter {
++        public final String key;
++        public final String Name;
++        public final String Value;
++
++        public AdditionalParameter(String key, String name, String value) {
++            this.key = key;
++            Name = name;
++            Value = value;
++        }
++    }
+ }
+\ No newline at end of file
+diff --git a/app/src/main/java/il/co/anyway/app/models/Localization.java b/app/src/main/java/il/co/anyway/app/models/Localization.java
+index d87d458..200a616 100644
+--- a/app/src/main/java/il/co/anyway/app/models/Localization.java
++++ b/app/src/main/java/il/co/anyway/app/models/Localization.java
+@@ -13,7 +13,6 @@ public class Localization {
+ 			put(1, "עירוני בצומת");
+ 			put(2, "עירוני לא בצומת");
+ 			put(3, "לא עירוני בצומת");
+-			put(4, "לא עירוני לא בצומת");
+ 		}}); 
+ 		values.put("YEHIDA", new HashMap<Integer, String>() {{
+ 			put(11, "מרחב חוף (חיפה)");
+@@ -29,7 +28,6 @@ public class Localization {
+ 			put(43, "מרחב יהודה");
+ 			put(51, "מרחב השרון");
+ 			put(52, "מרחב השפלה");
+-			put(61, "מחוז ירושלים");
+ 		}}); 
+ 		values.put("SUG_YOM", new HashMap<Integer, String>() {{
+ 			put(1, "חג");
+@@ -62,6 +60,7 @@ public class Localization {
+ 			put(18, "התנגשות אחור אל צד");
+ 			put(19, "התנגשות עם בעל חיים");
+ 			put(20, "פגיעה ממטען של רכב");
++			put(21, "איחוד הצלה");
+ 		}}); 
+ 		values.put("ZURAT_DEREH", new HashMap<Integer, String>() {{
+ 			put(1, "כניסה למחלף");
+@@ -137,6 +136,95 @@ public class Localization {
+ 			put(4, "ערפילי");
+ 			put(5, "אחר");
+ 		}}); 
++		values.put("MEZEG_AVIR_UNITED", new HashMap<Integer, String>() {{
++			put(1, "בהיר");
++			put(2, "עננים מתפזרים");
++			put(3, "היערמות עננים");
++			put(4, "ראות לקויה כתוצאה מעשן");
++			put(5, "אובך");
++			put(6, "אבק");
++			put(7, "סופת חול");
++			put(8, "ראות לקויה");
++			put(9, "ערפל קל");
++			put(10, "ברקים");
++			put(11, "סופת רעמים");
++			put(12, "סערה");
++			put(13, "סופה באופק");
++			put(14, "טפטוף");
++			put(15, "גשם");
++			put(16, "שלג");
++			put(17, "שלג מעורב בגשם");
++			put(18, "קרה(גשם קפוא)");
++			put(19, "גשם כבד");
++			put(20, "שלג כבד");
++			put(21, "ברד כבד");
++			put(22, "ערפל");
++			put(23, "סופת רעמים וגשם");
++			put(24, "סופת חול קלה");
++			put(25, "סחף שלג (ראות לקויה)");
++			put(26, "ערפל באופק");
++			put(27, "כיסי ערפל");
++			put(28, "ערפל קל מתפוגג");
++			put(29, "ערפל כבד מתפוגג");
++			put(30, "ערפל כבד");
++			put(31, "כפור, ערפל קל");
++			put(32, "כפור, ערפל כבד");
++			put(33, "טפטוף קל לפרקים");
++			put(34, "טפטוף קל");
++			put(35, "טפטוף");
++			put(36, "גשם קל לפרקים");
++			put(37, "גשם קל");
++			put(38, "טפטוף קל, קופא במגע עם הקרקע");
++			put(39, "טפטוף קופא במגע עם הקרקע");
++			put(40, "גשם לפרקים");
++			put(41, "גשם כבד לפרקים");
++			put(42, "גשם קל קופא במגע עם הקרקע");
++			put(43, "גשם קופא במגע עם הקרקע");
++			put(44, "שלג קל מעורב בגשם");
++			put(45, "שלג כבד מעורב בגשם");
++			put(46, "שלג קל לפרקים");
++			put(47, "שלג קל");
++			put(48, "שלג לפרקים");
++			put(49, "שלג");
++			put(50, "שלג כבד לפרקים");
++			put(51, "שלג כבד");
++			put(52, "שלג, שמיים בהירים");
++			put(53, "שלג דק");
++			put(54, "שלג עבה");
++			put(55, "שלג מעורב בגשם, קרח שחור");
++			put(56, "ממטרים קלים");
++			put(57, "ממטרים");
++			put(58, "ממטרים כבדים");
++			put(59, "ממטרים קלים, שלג מעורב בגשם");
++			put(60, "ממטרים, שלג מעורב בגשם");
++			put(61, "ממטרי שלג קלים");
++			put(62, "ממטרי שלג");
++			put(63, "ממטרי שלג/ברד קלים");
++			put(64, "ממטרי ברד/שלג");
++			put(65, "ממטרי ברד קלים");
++			put(66, "ממטרי ברד");
++			put(67, "סופת רעמים, גשם קל");
++			put(68, "גשם, סופת רעמים");
++			put(69, "סופת רעמים, שלג קל/שלג קל מעורב בגשם");
++			put(70, "סופת רעמים, שלג/ שלג מעורב בגשם");
++			put(71, "סופת רעמים");
++			put(72, "סופת רעמים, ברד");
++			put(73, "סופת רעמים כבדה");
++			put(74, "סופת רעמים וחול כבדה");
++			put(75, "סופת רעמים כבדה, ברד");
++			put(76, "סופת רוחות");
++			put(77, "רוחות חזקות");
++			put(78, "גשם שוטף");
++			put(79, "גשם זלעפות");
++			put(80, "סופת רוחות, גשם קל");
++			put(81, "גשם וסופת רוחות ");
++			put(82, "סופת רוחות, גשם שוטף");
++			put(83, "סופת רוחות, גשם זלעפות");
++			put(84, "רוחות חזקות, גשם קל");
++			put(85, "גשם ורוחות חזקות");
++			put(86, "רוחות חזקות, גשם שוטף");
++			put(87, "רוחות חזקות, גשם זלעפות");
++		}}); 
+ 		values.put("PNE_KVISH", new HashMap<Integer, String>() {{
+ 			put(1, "יבש");
+ 			put(2, "רטוב ממים");
+@@ -232,5 +320,35 @@ public class Localization {
+ 	localizedNames.put("EZOR_TIVI", "אזור טבעי");
+ 	localizedNames.put("MAAMAD_MINIZIPALI", "מעמד מוניציפלי");
+ 	localizedNames.put("ZURAT_ISHUV", "צורת יישוב");
++	localizedNames.put("SUG_MEORAV", "סוג מעורב");
++	localizedNames.put("SHNAT_HOZAA", "שנת הוצאת רשיון נהיגה");
++	localizedNames.put("KVUZA_GIL", "קבוצת גיל");
++	localizedNames.put("MIN", "מין");
++	localizedNames.put("SUG_REHEV_NASA_LMS", "סוג רכב בו נסע");
++	localizedNames.put("EMZAE_BETIHUT", "אמצעי בטיחות");
++	localizedNames.put("HUMRAT_PGIA", "חומרת פגיעה");
++	localizedNames.put("SUG_NIFGA_LMS", "סוג נפגע");
++	localizedNames.put("PEULAT_NIFGA_LMS", "מיקום פצוע");
++	localizedNames.put("KVUTZAT_OHLUSIYA_LMS", "קבוצת אוכלוסיה");
++	localizedNames.put("MAHOZ_MEGURIM", "מחוז מגורים");
++	localizedNames.put("NAFA_MEGURIM", "נפת מגורים");
++	localizedNames.put("EZOR_TIVI_MEGURIM", "אזור טבעי מגורים");
++	localizedNames.put("MAAMAD_MINIZIPALI_MEGURIM", "מעמד מוניצפלי מגורים");
++	localizedNames.put("ZURAT_ISHUV_MEGURIM", "צורת ישוב מגורים");
++	localizedNames.put("PAZUA_USHPAZ", "משך אשפוז");
++	localizedNames.put("MADAD_RAFUI", "מדד רפואי לחומרת הפציעה - ISS");
++	localizedNames.put("YAAD_SHIHRUR", "יעד שחרור");
++	localizedNames.put("SHIMUSH_BE_AVIZAREY_BETIHOT", "שימוש באביזרי בטיחות");
++	localizedNames.put("PTIRA_MEUHERET", "מועד הפטירה");
++	localizedNames.put("NEFAH", "נפח מנוע");
++	localizedNames.put("SHNAT_YITZUR", "שנת ייצור");
++	localizedNames.put("KIVUNE_NESIA", "כיוון נסיעה");
++	localizedNames.put("MATZAV_REHEV", "מצב רכב");
++	localizedNames.put("SHIYUH_REHEV_LMS", "שיוך רכב");
++	localizedNames.put("SUG_REHEV_LMS", "סוג רכב");
++	localizedNames.put("MEKOMOT_YESHIVA_LMS", "מקומות ישיבה");
++	localizedNames.put("MISHKAL_KOLEL_LMS", "משקל כולל");
++	localizedNames.put("ACC_ID", "מספר סידורי");
++	localizedNames.put("PROVIDER_CODE", "סוג תיק");
+ 	}
+ }
+\ No newline at end of file
+diff --git a/app/src/main/java/il/co/anyway/app/singletons/AnywayRequestQueue.java b/app/src/main/java/il/co/anyway/app/singletons/AnywayRequestQueue.java
+index cf5a4e5..f306d1d 100644
+--- a/app/src/main/java/il/co/anyway/app/singletons/AnywayRequestQueue.java
++++ b/app/src/main/java/il/co/anyway/app/singletons/AnywayRequestQueue.java
+@@ -9,9 +9,11 @@ import com.android.volley.Request;
+ import com.android.volley.RequestQueue;
+ import com.android.volley.Response;
+ import com.android.volley.VolleyError;
++import com.android.volley.toolbox.JsonArrayRequest;
+ import com.android.volley.toolbox.JsonObjectRequest;
+ import com.android.volley.toolbox.Volley;
+ 
++import org.json.JSONArray;
+ import org.json.JSONException;
+ import org.json.JSONObject;
+ 
+@@ -34,6 +36,7 @@ public class AnywayRequestQueue {
+ 
+     public final static String ANYWAY_BASE_URL = "http://www.anyway.co.il/";
+     public final static String ANYWAY_MARKERS_BASE_URL = ANYWAY_BASE_URL + "markers?";
++    public final static String ANYWAY_MARKER_ADDITIONAL_INFO_BASE_URL = ANYWAY_BASE_URL + "markers/";
+     public final static String ANYWAY_DISCUSSION_POST_URL = ANYWAY_BASE_URL + "discussion";
+     public final static String ANYWAY_HIGHLIGHT_POINTS = ANYWAY_BASE_URL + "highlightpoints";
+ 
+@@ -75,6 +78,53 @@ public class AnywayRequestQueue {
+         return instance;
+     }
+ 
++    public void addAccidentAdditionalInfoRequest(Accident accident) {
++        Uri.Builder builder = Uri.parse(ANYWAY_MARKER_ADDITIONAL_INFO_BASE_URL).buildUpon()
++                .appendPath(Long.toString(accident.getId()));
++
++        Uri builtUri = builder.build();
++
++        try {
++            URL url = new URL(builtUri.toString());
++            Log.d(AnywayRequestQueue.class.getSimpleName(), "Url: " + url);
++            addAccidentAdditionalInfoRequest(url.toString());
++        } catch (MalformedURLException e) {
++            Log.e(LOG_TAG, "Error building the URL: " + e.getMessage());
++        }
++    }
++
++    private void addAccidentAdditionalInfoRequest(String url) {
++        JsonArrayRequest jsObjRequest = new JsonArrayRequest
++                (Request.Method.GET, url, new Response.Listener<JSONArray>() {
++
++                    @Override
++                    public void onResponse(JSONArray response) {
++
++                        Log.d("gggggg", "got  " + response.toString());
++
++//                        List<Accident> fetchedAccidents = new ArrayList<>();
++//                        List<Discussion> fetchedDiscussion = new ArrayList<>();
++//
++//                        int fetchStatus = Utility.getMarkersDataFromJson(response, fetchedAccidents, fetchedDiscussion);
++//
++//                        if (fetchStatus == 0) {
++//                            MarkersManager.getInstance().addAllAccidents(fetchedAccidents, shouldReset);
++//                            MarkersManager.getInstance().addAllDiscussions(fetchedDiscussion, shouldReset);
++//                        }
++
++                    }
++                }, new Response.ErrorListener() {
++
++                    @Override
++                    public void onErrorResponse(VolleyError error) {
++                        Log.e("gggggg", error.toString());
++                    }
++                });
++
++        // Add the request to the RequestQueue.
++        mRequestQueue.add(jsObjRequest);
++    }
++
+     /**
+      * Add a request to get accidents from Anyway by parameters
+      * Build the request url and call @code #addMarkersRequest(url)
+diff --git a/scripts/generate_localization.py b/scripts/generate_localization.py
+index 98c73cd..b5569e7 100644
+--- a/scripts/generate_localization.py
++++ b/scripts/generate_localization.py
+@@ -6,9 +6,10 @@ def print_out(str=''):
+ 	buff.append(('\t' * number_tabs) + str)
+ 
+ name_regex = re.compile('\s+\"([A-Z_]+)\":\s+{.*')
+-value_regex = re.compile('\s+(\d+):\s+\"(.*)\",.*')
++# value_regex = re.compile('\s+(\d+):\s+\"(.*)\",.*')
++value_regex = re.compile('\s+\"(\d+)\"\s*:\s+\"(.*)\",.*')
+ 
+-localized_names_regex = re.compile('\s+.*\"([A-Z_0-9]+)\":\s+\"(.*)\".*')
++localized_names_regex = re.compile('\s+.*\"([A-Z_]+[0-9]*)\":\s+\"(.*)\".*')
+ 
+ print_out('package il.co.anyway.app.models;')
+ print_out()
+@@ -23,7 +24,7 @@ print_out('public static Map<String, HashMap<Integer, String>> values = new Hash
+ print_out('public static Map<String, String> localizedNames = new HashMap<>();')
+ print_out('static {')
+ number_tabs = number_tabs + 1
+-lines = urllib2.urlopen('https://raw.githubusercontent.com/hasadna/anyway/dev/anyway/localization.py')
++lines = urllib2 .urlopen('https://raw.githubusercontent.com/hasadna/anyway/dev/static/js/localization.js')
+ first = True
+ for line in lines:
+ 	name_match = name_regex.match(line)
+@@ -46,7 +47,7 @@ for line in lines:
+ print_out("}}); ")
+ number_tabs = number_tabs - 1
+ 
+-lines = urllib2.urlopen('https://raw.githubusercontent.com/hasadna/anyway/dev/anyway/localization.py')
++lines = urllib2.urlopen('https://raw.githubusercontent.com/hasadna/anyway/dev/static/js/localization.js')
+ for line in lines:
+ 	localized_name_match = localized_names_regex.match(line)
+ 	if (localized_name_match):
+-- 
+2.13.5
+
