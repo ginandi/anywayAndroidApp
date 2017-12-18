@@ -281,6 +281,96 @@ public class Localization {
 			put(4, "מרכז קילומטר");
 			put(9, "לא עוגן");
 		}}); 
+		values.put("SUG_MEORAV", new HashMap<Integer, String>() {{
+			put(1, "נהג שלא נפגע");
+			put(2, "נהג נפגע");
+			put(3, "נפגע שאינו נהג");
+		}}); 
+		values.put("MIN", new HashMap<Integer, String>() {{
+			put(1, "זכר");
+			put(2, "נקבה");
+		}}); 
+		values.put("SUG_REHEV_NASA_LMS", new HashMap<Integer, String>() {{
+			put(1, "רכב נוסעים פרטי");
+			put(2, "משא עד 3.5 טון אחוד");
+			put(3, "משא עד 3.5 טון לא אחוד");
+			put(4, "משא 1.4 עד 9.9 טון משקל כולל");
+			put(5, "משא 10 עד 15.9 טון משקל כולל");
+			put(6, "משא 16 עד 33.9 טון משקל כולל");
+			put(7, "משא 34.0+טון משקל כולל");
+			put(8, "אופנוע עד 50 סמ״ק");
+			put(9, "אופנוע 51 עד 250 סמ״ק");
+			put(10, "אופנוע 251 עד 500 סמ״ק");
+			put(11, "אוטובוס");
+			put(12, "מונית");
+			put(13, "רכב עבודה");
+			put(14, "טרקטור");
+			put(15, "אופניים");
+			put(16, "רכבת");
+			put(17, "אחר");
+			put(18, "אוטובוס זעיר");
+			put(19, "אופנוע 501+ סמ״ק");
+		}}); 
+		values.put("EMZAE_BETIHUT", new HashMap<Integer, String>() {{
+			put(1, "חגר חגורה");
+			put(2, "חבש קסדת מגן (רק לאופנוע)");
+			put(3, "ישב במושב/ריתמה לילדים (רק לנפגע ילד)");
+			put(4, "לא השתמש באמצעי");
+			put(5, "לא ידוע");
+		}}); 
+		values.put("HUMRAT_PGIA", new HashMap<Integer, String>() {{
+			put(1, "הרוג");
+			put(2, "פצוע קשה");
+			put(3, "פצוע קל");
+		}}); 
+		values.put("SUG_NIFGA_LMS", new HashMap<Integer, String>() {{
+			put(1, "הולך רגל");
+			put(2, "נהג-רכב בעל 4+ גלגלים");
+			put(3, "נוסע- רכב בעל 4+ גלגלים");
+			put(4, "נהג-אופנוע");
+			put(5, "נוסע-אופנוע (לא נהג)");
+			put(6, "נהג-אופניים");
+			put(7, "נוסע-אופניים (לא נהג)");
+			put(8, "נהג-רכב לא ידוע");
+			put(9, "נוסע-רכב לא ידוע");
+		}}); 
+		values.put("PEULAT_NIFGA_LMS", new HashMap<Integer, String>() {{
+			put(1, "ישב ברכב במושב קדמי");
+			put(2, "ישב ברכב במושב אחורי");
+			put(3, "ישב ברכב בארגז מאחור");
+			put(4, "עמד ברכב");
+			put(5, "עלה לרכב");
+			put(6, "ירד מהרכב");
+			put(7, "פעולה אחרת");
+			put(8, "לא ידוע");
+			put(9, "הולך רגל");
+		}}); 
+		values.put("PAZUA_USHPAZ", new HashMap<Integer, String>() {{
+			put(1, "אשפוז עד 24 שעות");
+			put(2, "אשפוז מעל 24 שעות");
+		}}); 
+		values.put("MADAD_RAFUI", new HashMap<Integer, String>() {{
+			put(1, "קל (1-8)");
+			put(2, "בינוני (9-15)");
+			put(3, "קשה (16-24)");
+			put(4, "קשה מאוד (25-75)");
+		}}); 
+		values.put("YAAD_SHIHRUR", new HashMap<Integer, String>() {{
+			put(1, "בית");
+			put(2, "בית חולים אחר");
+			put(3, "מוסד שיקומי/ מחלקה שיקומית");
+			put(4, "מוות");
+			put(5, "אחר");
+		}}); 
+		values.put("SHIMUSH_BE_AVIZAREY_BETIHOT", new HashMap<Integer, String>() {{
+			put(1, "כן");
+			put(2, "לא");
+			put(3, "לא ידוע");
+		}}); 
+		values.put("PTIRA_MEUHERET", new HashMap<Integer, String>() {{
+			put(1, "פטירה רגילה עד 30 יום");
+			put(2, "פטירה מאוחרת מעל 30 יום");
+		}}); 
 	localizedNames.put("SUG_DEREH", "סוג דרך");
 	localizedNames.put("SHEM_ZOMET", "שם צומת");
 	localizedNames.put("SEMEL_YISHUV", "ישוב");

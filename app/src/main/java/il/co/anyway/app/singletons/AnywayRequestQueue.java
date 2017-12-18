@@ -30,6 +30,8 @@ import il.co.anyway.app.filters.FiltersRepository;
 import il.co.anyway.app.filters.UriQueryParamAppender;
 import il.co.anyway.app.models.Accident;
 import il.co.anyway.app.models.Discussion;
+import il.co.anyway.app.models.FieldNames;
+import il.co.anyway.app.models.Localization;
 
 // fetching accidents from Anyway servers
 public class AnywayRequestQueue {
@@ -99,12 +101,58 @@ public class AnywayRequestQueue {
 
                     @Override
                     public void onResponse(JSONArray response) {
+                        accident.involvedCars.clear();
+                        accident.involvedPeople.clear();
                         for (int i = 0; i < response.length(); i++) {
-                            
+                            try {
+                                JSONObject object = response.getJSONObject(i);
+                                List<HashMap<String, String>> mapsList = object.has("sex") ?
+                                        accident.involvedPeople : accident.involvedCars;
+                                HashMap<String, String> map = new HashMap<>();
+                                mapsList.add(map);
+                                JSONArray names = object.names();
+                                for (int j = 0; j < names.length(); j++) {
+                                    String name = names.getString(j);
+                                    String value = object.getString(name);
+                                    String capitalizedName = FieldNames.map.get(name);
+
+                                    if (capitalizedName == null) {
+                                        continue;
+                                    }
+
+                                    String translatedName = Localization.localizedNames.get(capitalizedName);
+
+                                    if (translatedName == null) {
+                                        continue;
+                                    }
+
+                                    HashMap<Integer, String> innerMap = Localization.values.get(capitalizedName);
+
+                                    String translatedValue;
+                                    if (innerMap == null) {
+                                        translatedValue = value;
+                                    } else {
+                                        try {
+                                            translatedValue = innerMap.get(Integer.parseInt(value));
+                                            if (translatedValue == null) {
+                                                continue;
+                                            }
+                                        } catch (NumberFormatException nfe) {
+                                            translatedValue = value;
+                                        }
+                                    }
+
+                                    map.put(translatedName, translatedValue);
+
+                                }
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                         }
 
 
-                        Log.d("gggggg", "got  " + response.toString());
+                        Log.d("gggggg", "got  " + accident);
 
 //                        List<Accident> fetchedAccidents = new ArrayList<>();
 //                        List<Discussion> fetchedDiscussion = new ArrayList<>();
@@ -133,13 +181,13 @@ public class AnywayRequestQueue {
      * Add a request to get accidents from Anyway by parameters
      * Build the request url and call @code #addMarkersRequest(url)
      *
-     * @param ne_lat north east bound latitude
-     * @param ne_lng north east bound longitude
-     * @param sw_lat south west bound latitude
-     * @param sw_lng south west bound longitude
-     * @param zoom zoom level
+     * @param ne_lat     north east bound latitude
+     * @param ne_lng     north east bound longitude
+     * @param sw_lat     south west bound latitude
+     * @param sw_lng     south west bound longitude
+     * @param zoom       zoom level
      * @param start_date start date (timestamp as String)
-     * @param end_date end date (timestamp as String)
+     * @param end_date   end date (timestamp as String)
      */
     public void addMarkersRequest(double ne_lat, double ne_lng, double sw_lat, double sw_lng, int zoom,
                                   String start_date, String end_date, boolean shouldReset) {
@@ -216,8 +264,8 @@ public class AnywayRequestQueue {
     /**
      * send location fore statistics
      *
-     * @param lat location latitude
-     * @param lng location longitude
+     * @param lat  location latitude
+     * @param lng  location longitude
      * @param type HIGHLIGHT_TYPE_USER_SEARCH / HIGHLIGHT_TYPE_USER_GPS
      */
     public void sendUserAndSearchedLocation(double lat, double lng, int type) {

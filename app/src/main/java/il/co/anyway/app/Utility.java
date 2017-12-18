@@ -287,7 +287,7 @@ public class Utility {
                 }
                 String actualValue = possibleValues.get(value);
                 if (actualValue != null) {
-                    accident.addAdditionalParameters(new AdditionalParameter(key, localizedKeyInHebrew, actualValue));
+                    accident.addAdditionalParameter(new AdditionalParameter(key, localizedKeyInHebrew, actualValue));
                 }
             }
 

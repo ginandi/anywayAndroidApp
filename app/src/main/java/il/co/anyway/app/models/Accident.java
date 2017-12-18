@@ -5,6 +5,7 @@ import com.google.android.gms.maps.model.LatLng;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 public class Accident {
@@ -54,6 +55,8 @@ public class Accident {
     private int locationAccuracy;
     private boolean markerAddedToMap;
     private List<AdditionalParameter> additionalParameters = new ArrayList<>();
+    public final List<HashMap<String, String>> involvedPeople = new ArrayList<>();
+    public final List<HashMap<String, String>> involvedCars = new ArrayList<>();
 
     public Accident(long id, String title, String description, int type, int subType, int severity,
                     Date created, LatLng location, String address, int locationAccuracy) {
@@ -159,7 +162,7 @@ public class Accident {
         return additionalParameters;
     }
 
-    public void addAdditionalParameters(AdditionalParameter additionalParameter) {
+    public void addAdditionalParameter(AdditionalParameter additionalParameter) {
         this.additionalParameters.add(additionalParameter);
     }
 
@@ -192,7 +195,8 @@ public class Accident {
 
     @Override
     public String toString() {
-        return String.format("Accident %s is in %s", title, location);
+        return "Involved cars = " + involvedCars + ", involed people = " + involvedPeople;
+//        return String.format("Accident %s is in %s", title, location);
     }
 
     public static class AdditionalParameter {
